@@ -11,7 +11,71 @@
 	<body>
 		<script src="../three.js-master/build/three.js"></script>
 		<script>
-			// Our Javascript will go here.
+			
+			var scene  = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+
+
+			var cube1Geometry = new THREE.BoxGeometry();
+			var cube1Material = new THREE.MeshBasicMaterial({color: 0xff7fff});
+			var cube1 = new THREE.Mesh(cube1Geometry, cube1Material);
+			scene.add(cube1);
+
+			var cube2Geometry = new THREE.BoxGeometry();
+			var cube2Material = new THREE.MeshBasicMaterial({color: 0x00baba});
+			var cube2 = new THREE.Mesh(cube2Geometry, cube2Material);
+			scene.add(cube2);
+
+			var cube3Geometry = new THREE.BoxGeometry();
+			var cube3Material = new THREE.MeshBasicMaterial({color: 0xffffff});
+			var cube3 = new THREE.Mesh(cube3Geometry, cube3Material);
+			scene.add(cube3);
+
+			console.log(cube1.position);
+
+			cube1.position.set(-2.5, 0, 0);
+			
+			cube2.position.set(3, 0, 0);
+			cube2.scale.set(1.5, 1.5, 1.5);
+
+			cube3.position.set(4, 0, 0);
+			cube3.scale.set(0.5, 0.5, 0.5);
+
+			camera.position.z = 5;
+
+
+			animate();
+
+			function animate() {
+				requestAnimationFrame(animate);
+
+				mil = new Date().getTime();
+
+				cube1Geometry.rotateX(0.01);
+				cube1Geometry.rotateY(0.01);
+
+				cube2.translateOnAxis(new THREE.Vector3(1, 0, 0), 0.025 * Math.sin(mil / 1000));
+				cube2.rotateX(0.01);
+
+				cube3.position.set(cube2.position.x, cube2.position.y, cube2.position.z);
+				cube3.translateOnAxis(
+					new THREE.Vector3(
+						Math.cos(mil / 500),
+						0,
+						Math.sin(mil / 500)
+					).applyQuaternion(cube2.quaternion),
+					2);
+
+				let s = 0.5 + (0.05 * Math.sin(mil / 50));
+				cube3.scale.set(s, s, s);
+
+				renderer.render(scene, camera);
+			}
+
 		</script>
 	</body>
 </html>
