@@ -16,6 +16,7 @@
 			var loader = new THREE.FileLoader();
 			var fshader, vshader;
 			var fshaderN, vshaderN;
+			var fshaderR, vshaderR;
 
 			// Load vertex shader
 			loader.load('shaders/vertexShader.vert',
@@ -35,7 +36,6 @@
 					console.error('An error happened');
 				}
 			);
-
 			// Load fragment shader
 			loader.load('shaders/fragmentShader.frag',
 			// onLoad callback
@@ -74,7 +74,6 @@
 					console.error('An error happened');
 				}
 			);
-
 			// Load custom fragment shader (normals)
 			loader.load('shaders/fragmentShaderNormals.frag',
 			// onLoad callback
@@ -94,6 +93,11 @@
 				}
 			);
 
+
+			var rainbowTexture = new THREE.TextureLoader().load(
+				"rainbow1.png",
+				loadRainbowShaders
+			);
 
 			// setup the scene
 			var scene = new THREE.Scene();
@@ -129,8 +133,9 @@
 			scene.add(light);
 
 
-			var geometry1, material1, mesh1;
-			var geometry2, material2, mesh2;
+			var geometry1, material1, mesh1; // Color interpolation
+			var geometry2, material2, mesh2; // Normal display
+			var geometry3, material3, mesh3; // Depth rainbow
 
 
 			function animate() {
@@ -154,6 +159,11 @@
 				if(geometry2) {
 					geometry2.rotateX(-0.01);
 					geometry2.rotateY(-0.01);
+				}
+
+				if(geometry3) {
+					geometry3.rotateX(0.01);
+					geometry3.rotateY(-0.01);
 				}
 
 
@@ -183,7 +193,6 @@
 			}
 
 			function addNormalsCube() {
-				console.log(count);
 				if(count == 4) {
 					let uniforms = {
 						colorX: {type: 'vec3', value: new THREE.Color(0xff0000)},
@@ -203,6 +212,69 @@
 					mesh2.position.set(2.5, -1, 0);
 					scene.add(mesh2);
 				}
+			}
+
+			function addRainbowCube() {
+				if(count == 6) {
+					console.log(rainbowTexture);
+					let uniforms = {
+						rainbow: {type: "t", value: rainbowTexture}
+					};
+
+					geometry3 = new THREE.BoxGeometry(1, 1, 1);
+					material3 =  new THREE.ShaderMaterial({
+						uniforms: uniforms,
+						fragmentShader: fshaderR,
+						vertexShader: vshaderR,
+						precision: "mediump"}
+					);
+
+					mesh3 = new THREE.Mesh(geometry3, material3);
+					mesh3.position.set(3.5, 1, 0);
+					scene.add(mesh3);
+				}
+			}
+
+
+
+			function loadRainbowShaders() {
+				console.log(rainbowTexture);
+				// Load custom vertex shader (rainbow)
+				loader.load('shaders/vertexShaderRainbow.vert',
+				// onLoad callback
+					function (data) {
+							console.log(data); // output the text to the console
+							vshaderR = data;
+							count += 1;
+							addRainbowCube();
+						},
+				// onProgress callback
+					function (xhr) {
+						console.log((xhr.loaded/xhr.total * 100)+ '% loaded');
+					},
+				// onError callback
+					function (err) {
+						console.error('An error happened');
+					}
+				);
+				// Load custom fragment shader (rainbow)
+				loader.load('shaders/fragmentShaderRainbow.frag',
+				// onLoad callback
+					function (data) {
+							console.log(data); // output the text to the console
+							fshaderR = data;
+							count += 1;
+							addRainbowCube();
+						},
+				// onProgress callback
+					function (xhr) {
+						console.log((xhr.loaded/xhr.total * 100)+ '% loaded');
+					},
+				// onError callback
+					function (err) {
+						console.error('An error happened');
+					}
+				);
 			}
 
 

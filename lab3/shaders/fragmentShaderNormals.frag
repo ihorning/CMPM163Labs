@@ -6,6 +6,7 @@ uniform vec3 colorY;
 uniform vec3 colorZ;
 
 void main() {
+	// Sum of all the colors scaled by dot product of normal and respective axis
 	vec3 color = (vNormal.x * colorX) + (vNormal.y * colorY) + (vNormal.z * colorZ);
-	gl_FragColor = vec4(color, 1.0); // Interpolate between colorA and colorB based on z value
+	gl_FragColor = vec4(color, 1.0);
 }
