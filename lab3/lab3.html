@@ -11,10 +11,53 @@
 	<body>
 		<script src="../three.js-master/build/three.js"></script>
 		<script>
+			THREE.Cache.enabled = true;
+			var count = 0;
+			var loader = new THREE.FileLoader();
+			var fshader, vshader;
+
+			// Load vertex shader
+			loader.load('shaders/vertexShader.vert',
+			// onLoad callback
+				function (data) {
+						console.log(data); // output the text to the console
+						vshader = data;
+						count += 1;
+						//addCoolCube(); // we will write this method
+					},
+			// onProgress callback
+				function (xhr) {
+					console.log((xhr.loaded/xhr.total * 100)+ '% loaded');
+				},
+			// onError callback
+				function (err) {
+					console.error('An error happened');
+				}
+			);
+
+			// Load fragment shader
+			loader.load('shaders/fragmentShader.frag',
+			// onLoad callback
+				function (data) {
+						console.log(data); // output the text to the console
+						fshader = data;
+						count += 1;
+						//addCoolCube(); // we will write this method
+					},
+			// onProgress callback
+				function (xhr) {
+					console.log((xhr.loaded/xhr.total * 100)+ '% loaded');
+				},
+			// onError callback
+				function (err) {
+					console.error('An error happened');
+				}
+			);
+			
+
 			// setup the scene
 			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera(75, 
-				window.innerWidth/window.innerHeight, 0.1, 1000);
+			var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			document.body.appendChild(renderer.domElement);
