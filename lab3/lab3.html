@@ -21,10 +21,24 @@
 			camera.position.z = 5;
 			
 			// setup the cube
-			var geometry = new THREE.BoxGeometry();
-			var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-			var cube = new THREE.Mesh( geometry, material );
-			scene.add(cube);
+			var cube1geometry = new THREE.BoxGeometry();
+			var cube1material = new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x00ff00, shininess: 30 });
+			var cube1 = new THREE.Mesh( cube1geometry, cube1material );
+			scene.add(cube1);
+			cube1.position.set(1.7, 0, 0);
+
+			var cube2geometry = new THREE.BoxGeometry();
+			var cube2material = new THREE.MeshPhongMaterial( { color: 0xea3788, specular: 0xff7f51, shininess: 100 });
+			var cube2 = new THREE.Mesh( cube2geometry, cube2material );
+			scene.add(cube2);
+			cube2.position.set(-1.7, 0, 0);
+
+			var cube3geometry = new THREE.BoxGeometry();
+			var cube3material = new THREE.MeshPhysicalMaterial( { color: 0xff7f51, emissive: 0x361134, clearcoat: 1, clearcoatRoughness: 0.4, reflectivity: 0.9, transparent: true, opacity: 0.6 });
+			var cube3 = new THREE.Mesh( cube3geometry, cube3material );
+			scene.add(cube3);
+			cube3.position.set(0, 0, 0);
+			cube3.scale.set(2, 2, 2);
 
 			// add the light
 			var light = new THREE.PointLight(0xffffff, 1, 1000);
@@ -33,8 +47,16 @@
 
 			function animate() {
 				requestAnimationFrame(animate);
-				geometry.rotateX(0.01);
-				geometry.rotateY(0.01);
+
+				cube1geometry.rotateX(0.01);
+				cube1geometry.rotateY(0.01);
+
+				cube2geometry.rotateX(0.01);
+				cube2geometry.rotateY(-0.01);
+
+				cube3geometry.rotateX(-0.02);
+				cube3geometry.rotateY(0.02);
+
 				renderer.render(scene, camera);
 			}
 			animate();
