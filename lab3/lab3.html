@@ -15,6 +15,7 @@
 			var count = 0;
 			var loader = new THREE.FileLoader();
 			var fshader, vshader;
+			var fshaderN, vshaderN;
 
 			// Load vertex shader
 			loader.load('shaders/vertexShader.vert',
@@ -55,6 +56,45 @@
 			);
 
 
+			// Load custom vertex shader (normals)
+			loader.load('shaders/vertexShaderNormals.vert',
+			// onLoad callback
+				function (data) {
+						console.log(data); // output the text to the console
+						vshaderN = data;
+						count += 1;
+						addNormalsCube();
+					},
+			// onProgress callback
+				function (xhr) {
+					console.log((xhr.loaded/xhr.total * 100)+ '% loaded');
+				},
+			// onError callback
+				function (err) {
+					console.error('An error happened');
+				}
+			);
+
+			// Load custom fragment shader (normals)
+			loader.load('shaders/fragmentShaderNormals.frag',
+			// onLoad callback
+				function (data) {
+						console.log(data); // output the text to the console
+						fshaderN = data;
+						count += 1;
+						addNormalsCube();
+					},
+			// onProgress callback
+				function (xhr) {
+					console.log((xhr.loaded/xhr.total * 100)+ '% loaded');
+				},
+			// onError callback
+				function (err) {
+					console.error('An error happened');
+				}
+			);
+
+
 			// setup the scene
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -68,20 +108,20 @@
 			var cube1material = new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x00ff00, shininess: 30 });
 			var cube1 = new THREE.Mesh( cube1geometry, cube1material );
 			scene.add(cube1);
-			cube1.position.set(1.7, 0, 0);
+			cube1.position.set(-4, 0, 0);
 
 			var cube2geometry = new THREE.BoxGeometry();
 			var cube2material = new THREE.MeshPhongMaterial( { color: 0xea3788, specular: 0xff7f51, shininess: 100 });
 			var cube2 = new THREE.Mesh( cube2geometry, cube2material );
 			scene.add(cube2);
-			cube2.position.set(-1.7, 0, 0);
+			cube2.position.set(0, 0, 0);
 
 			var cube3geometry = new THREE.BoxGeometry();
 			var cube3material = new THREE.MeshPhysicalMaterial( { color: 0xff7f51, emissive: 0x361134, clearcoat: 1, clearcoatRoughness: 0.4, reflectivity: 0.9, transparent: true, opacity: 0.6 });
 			var cube3 = new THREE.Mesh( cube3geometry, cube3material );
 			scene.add(cube3);
-			cube3.position.set(0, 0, 0);
-			cube3.scale.set(2, 2, 2);
+			cube3.position.set(-2, 0, 0);
+			cube3.scale.set(2.25, 2.25, 2.25);
 
 			// add the light
 			var light = new THREE.PointLight(0xffffff, 1, 1000);
@@ -90,6 +130,7 @@
 
 
 			var geometry1, material1, mesh1;
+			var geometry2, material2, mesh2;
 
 
 			function animate() {
@@ -108,6 +149,11 @@
 				if(geometry1) {
 					geometry1.rotateX(0.01);
 					geometry1.rotateY(0.01);
+				}
+
+				if(geometry2) {
+					geometry2.rotateX(-0.01);
+					geometry2.rotateY(-0.01);
 				}
 
 
@@ -131,8 +177,31 @@
 					);
 
 					mesh1 = new THREE.Mesh(geometry1, material1);
-					mesh1.position.x = 4;
+					mesh1.position.set(1.5, 1, 0);
 					scene.add(mesh1);
+				}
+			}
+
+			function addNormalsCube() {
+				console.log(count);
+				if(count == 4) {
+					let uniforms = {
+						colorX: {type: 'vec3', value: new THREE.Color(0xff0000)},
+						colorY: {type: 'vec3', value: new THREE.Color(0x00ff00)},
+						colorZ: {type: 'vec3', value: new THREE.Color(0x0000ff)}
+					};
+
+					geometry2 = new THREE.BoxGeometry(1, 1, 1);
+					material2 =  new THREE.ShaderMaterial({
+						uniforms: uniforms,
+						fragmentShader: fshaderN,
+						vertexShader: vshaderN,
+						precision: "mediump"}
+					);
+
+					mesh2 = new THREE.Mesh(geometry2, material2);
+					mesh2.position.set(2.5, -1, 0);
+					scene.add(mesh2);
 				}
 			}
 
