@@ -135,10 +135,13 @@
 
 			var geometry1, material1, mesh1; // Color interpolation
 			var geometry2, material2, mesh2; // Normal display
-			var geometry3, material3, mesh3; // Depth rainbow
+			var geometry3, material3, mesh3; // Depth rainbow (cube)
+			var geometry4, material4, mesh4; // Depth rainbow (sphere)
 
 
 			function animate() {
+				mil = new Date().getTime();
+
 				requestAnimationFrame(animate);
 
 				cube1geometry.rotateX(0.01);
@@ -164,6 +167,13 @@
 				if(geometry3) {
 					geometry3.rotateX(0.01);
 					geometry3.rotateY(-0.01);
+					mesh3.material.uniforms.direction.value = new THREE.Vector3(0, Math.sin(mil / 2000), Math.cos(mil / 2000));
+					mesh3.material.uniforms.scale.value = 2 + Math.sin(mil / 500);
+				}
+
+				if(geometry4) {
+					mesh4.material.uniforms.direction.value = new THREE.Vector3(0, Math.sin(mil / 2000), Math.cos(mil / 2000));
+					mesh4.material.uniforms.scale.value = 2 + Math.sin(mil / 500);
 				}
 
 
@@ -216,9 +226,10 @@
 
 			function addRainbowCube() {
 				if(count == 6) {
-					console.log(rainbowTexture);
 					let uniforms = {
-						rainbow: {type: "t", value: rainbowTexture}
+						rainbow: {type: "t", value: rainbowTexture},
+						direction: {type: "v3", value: new THREE.Vector3(0, 0, 1)},
+						scale: {type: "f", value: 1.0}
 					};
 
 					geometry3 = new THREE.BoxGeometry(1, 1, 1);
@@ -234,6 +245,27 @@
 					scene.add(mesh3);
 				}
 			}
+			function addRainbowSphere() {
+				if(count == 6) {
+					let uniforms = {
+						rainbow: {type: "t", value: rainbowTexture},
+						direction: {type: "v3", value: new THREE.Vector3(0, 0, 1)},
+						scale: {type: "f", value: 1.0}
+					};
+
+					geometry4 = new THREE.SphereGeometry(0.5, 32, 32);
+					material4 =  new THREE.ShaderMaterial({
+						uniforms: uniforms,
+						fragmentShader: fshaderR,
+						vertexShader: vshaderR,
+						precision: "mediump"}
+					);
+
+					mesh4 = new THREE.Mesh(geometry4, material4);
+					mesh4.position.set(4.5, -1, 0);
+					scene.add(mesh4);
+				}
+			}
 
 
 
@@ -247,6 +279,7 @@
 							vshaderR = data;
 							count += 1;
 							addRainbowCube();
+							addRainbowSphere();
 						},
 				// onProgress callback
 					function (xhr) {
@@ -265,6 +298,7 @@
 							fshaderR = data;
 							count += 1;
 							addRainbowCube();
+							addRainbowSphere();
 						},
 				// onProgress callback
 					function (xhr) {
