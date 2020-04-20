@@ -1,12 +1,12 @@
-#CMPM163Labs
+# CMPM163Labs
 
-##Lab 2
+## Lab 2
 https://drive.google.com/file/d/1bGyNadr0rwgjOGOviXEX98w_YDtNyvJW/view?usp=sharing
 
 ![](lab2/rabbit_scene.PNG)
 
 
-##Lab 3
+## Lab 3
 https://drive.google.com/file/d/1hypx7C1F3pt6iiIhd0DwOwo-dYjgK3Cw/view?usp=sharing
 Cubes from left to right:
 1. The original cube. It has the phong material with green specular.
