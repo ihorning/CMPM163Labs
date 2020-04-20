@@ -8,6 +8,7 @@ https://drive.google.com/file/d/1bGyNadr0rwgjOGOviXEX98w_YDtNyvJW/view?usp=shari
 
 ## Lab 3
 https://drive.google.com/file/d/1hypx7C1F3pt6iiIhd0DwOwo-dYjgK3Cw/view?usp=sharing
+
 Cubes from left to right:
 1. The original cube. It has the phong material with green specular.
 2. I used THREE.MeshPhysicalMaterial() instead of THREE.MeshPhongMaterial. The cube has an emission value of 0x361134, a clearcoat (1.0), high reflectivity (0.9), and 60% opacity.
