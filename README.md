@@ -39,3 +39,5 @@ TOP ROW:
 BOTTOM ROW:
 1. (v) Unlit cube shaded with a texture (176.jpg) tiled 2x2 using custom shaders (the ones in the HTML)
 2. (v) Unlit cube shaded with a texture (176.jpg) tiled 5x5 using custom shaders (the ones in the HTML)
+
+I solved the cube 5 problem by multiplying the uv coordinates by a scale (textureScale 2 gives you 2x2, 5 gives you 5x5, etc.) and using mod() so it repeats.

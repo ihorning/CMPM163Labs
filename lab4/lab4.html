@@ -31,6 +31,7 @@
 			varying vec2 vUv;
 
 			void main() {
+				// Multiply the uv coordinates by a scale (for scale n you get n x n tiles) and use mod to make it repeat
 				gl_FragColor = texture2D(texture1, vec2(mod(vUv.x * textureScale, 1.0), mod(vUv.y * textureScale, 1.0)));
 			}
 
