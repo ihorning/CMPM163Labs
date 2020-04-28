@@ -21,9 +21,9 @@ Cubes from left to right:
 ## Lab 4
 https://drive.google.com/file/d/1KD9fNM1WVTzZRCSLSRVHViGSguA5zPFW/view?usp=sharing
 
-a. x = floor(u * 8)
+a. x = min(floor(u * 8), 7)
 
-b. y = floor((1 - v) * 8)
+b. y = min(floor((1 - v) * 8), 7)
 
 c. white
 
