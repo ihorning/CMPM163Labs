@@ -24,3 +24,13 @@ a. x = floor(u * 8)
 b. y = floor((1 - v) * 8)
 
 c. white
+
+Cubes from left to right:
+TOP ROW:
+1. (ii) Cube shaded with a texture (163.jpg) and a normal map (163_norm.jpg) using THREE.MeshPhongMaterial material
+2. (i) Cube shaded with only the texture (163.jpg) using THREE.MeshPhongMaterial material
+3. (iii) Another cube with a texture (161.jpg) and a normal map (176_norm.jpg) using THREE.MeshPhongMaterial material
+4. (iv) Unlit cube shaded with a texture (161.jpg) using custom shaders
+BOTTOM ROW:
+1. (v) Unlit cube shaded with a texture (176.jpg) tiled 2x2 using custom shaders (the ones in the HTML)
+2. (v) Unlit cube shaded with a texture (176.jpg) tiled 5x5 using custom shaders (the ones in the HTML)

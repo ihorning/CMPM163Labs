@@ -64,8 +64,8 @@
 					);
 
 					mesh1 = new THREE.Mesh(geometry1, material1);
-					mesh1.position.x = 1.5;
-					mesh1.position.y = -1.5;
+					mesh1.position.x = 2.25;
+					mesh1.position.y = 1;
 					scene.add(mesh1);
 				}
 			}
@@ -127,16 +127,20 @@
 
 			var cube = new THREE.Mesh(geometry, material);
 			scene.add(cube);
+			cube.position.x = -2.25;
+			cube.position.y = 1;
 
 			material = new THREE.MeshPhongMaterial( { map: texture } );
 			var cube2 = new THREE.Mesh(geometry, material);
 			scene.add(cube2);
-			cube2.position.x = -2;
+			cube2.position.x = -0.75;
+			cube2.position.y = 1;
 
 			material = new THREE.MeshPhongMaterial( { map: texture2, normalMap: normMap2 } );
 			var cube3 = new THREE.Mesh(geometry, material);
 			scene.add(cube3);
-			cube3.position.x = 2;
+			cube3.position.x = 0.75;
+			cube3.position.y = 1;
 
 			material = new THREE.ShaderMaterial({
 				uniforms: {
@@ -148,8 +152,8 @@
 			});
 			var cube4 = new THREE.Mesh(geometry, material);
 			scene.add(cube4);
-			cube4.position.x = -1.5;
-			cube4.position.y = -1.5;
+			cube4.position.x = -1;
+			cube4.position.y = -1;
 
 			material = new THREE.ShaderMaterial({
 				uniforms: {
@@ -161,8 +165,8 @@
 			});
 			var cube5 = new THREE.Mesh(geometry, material);
 			scene.add(cube5);
-			cube5.position.x = -3.5;
-			cube5.position.y = -1.5;
+			cube5.position.x = 1;
+			cube5.position.y = -1;
 
 
 			// add the light
