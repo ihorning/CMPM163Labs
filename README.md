@@ -17,3 +17,8 @@ Cubes from left to right:
 5. This cube uses a custom shader. It does flat shading, where the color of each face is determined by the face normal. The face color is the sum of the x, y and z colors multiplied by the dot of the face normal and each respective axis. The axis colors are specified in the material. I used 0xff0000, 0x00ff00, and 0x0000ff for x, y, and z for this cube.
 6. This cube uses another custom shader. The color of each fragment is taken from a texture (I'm using a rainbow gradient). The u coordinate for each fragment is determined by the dot product of its position and a given "direction." (The v coordinate is always 0). So if you set direction to (0, 0, 1), it would be picking colors based on the z position of each fragment. There is also a "scale" uniform that multiplies the dot product. I update the direction and scale values in my animate function.
 7. This sphere uses the same custom shader as the previous cube. I just added it to see how it would look on something more round.
+
+## Lab 4
+a. x = floor(u * 8)
+b. y = floor((1 - v) * 8)
+c. white
