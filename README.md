@@ -20,5 +20,7 @@ Cubes from left to right:
 
 ## Lab 4
 a. x = floor(u * 8)
+
 b. y = floor((1 - v) * 8)
+
 c. white
