@@ -43,4 +43,6 @@ BOTTOM ROW:
 I solved the cube 5 problem by multiplying the uv coordinates by a scale (textureScale 2 gives you 2x2, 5 gives you 5x5, etc.) and using mod() so it repeats.
 
 ## Lab 5
-https://drive.google.com/file/d/1-H-aNcodNrsRdhrgTUB-8j1eAPIC0PnK/view?usp=sharing
+Part 2 a: https://drive.google.com/file/d/1-H-aNcodNrsRdhrgTUB-8j1eAPIC0PnK/view?usp=sharing
+Part 2 b explosion: https://drive.google.com/file/d/1pC2sxC6xGIbNhl-Y7ljK7y6ExpU6DqPM/view?usp=sharing
+Part 2 b custom: 
