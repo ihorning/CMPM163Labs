@@ -23,7 +23,7 @@
 
 			particles = []
 			const geo = new THREE.Geometry()
-			for(let i=0; i<1000; i++) {
+			for(let i=0; i<3000; i++) {
 				const particle = {
 					position: new THREE.Vector3(
 						Math.random() * 2 - 1,
@@ -40,27 +40,58 @@
 						Math.random() * .002 - .001, 
 						0
 					),
+					color: new THREE.Color()
 				}
 				particles.push(particle);
-				geo.vertices.push(particle.position)
+				geo.vertices.push(particle.position);
+				geo.colors.push(particle.color);
 			}
 
-			const mat = new THREE.PointsMaterial({ color:0xffffff, size: 0.5 });
+
+			var sprite = new THREE.TextureLoader().load('disc.png');
+			const mat = new THREE.PointsMaterial({ vertexColors: THREE.VertexColors, size: 5, sizeAttenuation: false, map: sprite });
 			mesh = new THREE.Points(geo, mat);
 			mesh.position.z = -4;
 			scene.add(mesh);
 
 
+			var chaseList = [];
+			for(var i = 0; i < particles.length; i++) {
+				chaseList[i] = Math.floor(Math.random() * particles.length);
+			}
 
+			var maxVel = 0.05;
+
+			var mil = Date.now() / 1000;
 
 			function animate() {
 				requestAnimationFrame(animate);
 
+				let newMil = Date.now() / 1000;
+				maxVel += (newMil - mil) / 100;
+				mil = newMil;
+
+
+				for(var i = 0; i < particles.length; i++) {
+					let chase = new THREE.Vector3(
+						particles[chaseList[i]].position.x - particles[i].position.x,
+						particles[chaseList[i]].position.y - particles[i].position.y,
+						particles[chaseList[i]].position.z - particles[i].position.z
+					);
+					particles[i].acceleration = chase.normalize();
+					particles[i].acceleration.multiplyScalar(0.01);
+				}
+
 				particles.forEach(p => {
 					p.velocity.add(p.acceleration);
+					if(p.velocity.length() > maxVel) p.velocity.normalize().multiplyScalar(maxVel);
 					p.position.add(p.velocity);
+					let newColor = new THREE.Vector3(p.velocity.x, p.velocity.y, p.velocity.z);
+					newColor.normalize();
+					p.color.setRGB((newColor.x + 1) / 2, (newColor.y + 1) / 2, (newColor.z + 1) / 2);
 				});
 				mesh.geometry.verticesNeedUpdate = true;
+				mesh.geometry.colorsNeedUpdate = true;
 
 				renderer.render(scene, camera);
 			}
