@@ -45,4 +45,6 @@ I solved the cube 5 problem by multiplying the uv coordinates by a scale (textur
 ## Lab 5
 Part 2 a: https://drive.google.com/file/d/1-H-aNcodNrsRdhrgTUB-8j1eAPIC0PnK/view?usp=sharing
 Part 2 b explosion: https://drive.google.com/file/d/1pC2sxC6xGIbNhl-Y7ljK7y6ExpU6DqPM/view?usp=sharing
-Part 2 b custom: 
+Part 2 b custom: https://drive.google.com/file/d/1P2imYPTNeCddY9r33z5tP6kkPvzSQfoM/view?usp=sharing
+
+For my custom particle effect, I have each particle assigned another particle to follow. Its acceleration is adjusted every frame so it moves towards this other particle. The velocity of the particles is clamped, but the limit increases over time. Each particle's color is determined by its direction of motion.
