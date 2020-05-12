@@ -53,3 +53,5 @@ For my custom particle effect, I have each particle assigned another particle to
 
 ## Lab 6 (Part 2)
 ![](lab6/lab6_capture1.PNG)
+
+Link to Shadertoy: https://www.shadertoy.com/view/WdBBRR
