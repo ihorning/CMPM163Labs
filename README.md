@@ -55,3 +55,5 @@ For my custom particle effect, I have each particle assigned another particle to
 ![](lab6/lab6_capture1.PNG)
 
 Link to Shadertoy: https://www.shadertoy.com/view/WdBBRR
+
+Here's a neat project someone else made that visualizes audio with a clay pot on a pottery wheel: https://www.shadertoy.com/view/4sf3DB
