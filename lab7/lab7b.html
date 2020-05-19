@@ -35,6 +35,27 @@
 			scene.add(plane);
 
 
+			var matShader;
+			mat.onBeforeCompile = (shader) => {
+				shader.uniforms.time = { value: 0}
+				shader.vertexShader = `
+					uniform float time;
+				` + shader.vertexShader
+		
+				const token = '#include <begin_vertex>'
+				const customTransform = `
+					vec3 transformed = vec3(position);
+					float freq = 3.0;
+					float amp = 0.1;
+					float angle = (time + position.x)*freq;
+					transformed.z += sin(angle)*amp;
+				`
+				shader.vertexShader = shader.vertexShader.replace(token,customTransform)
+				matShader = shader
+			}
+
+
+
 			function animate(time) {
 				requestAnimationFrame(animate);
 				renderer.render(scene, camera);
