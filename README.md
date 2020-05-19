@@ -60,10 +60,12 @@ Here's a neat project someone else made that visualizes audio with a clay pot on
 
 ## Lab 7 (Part 2)
 Part 2a:
+
 Here is the textured screenshot. I made it interpolate between two textures based on height.
 ![](lab7/lab7_capture1.PNG)
 Here is just the heightmap used as the texture.
 ![](lab7/lab7_capture2.PNG)
 
 Part 2b:
+
 https://drive.google.com/file/d/10PggDjK78I28tHiREZk6S9UsxX5JmxT2/view?usp=sharing
