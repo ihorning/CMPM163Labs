@@ -148,10 +148,11 @@
 				"Wood_Boat.glb",
 				function (gltf) {
 					boat = gltf.scene;
-					console.log(boat);
 					scene.add(gltf.scene);
 					boat.position.set(3, 0, 0);
 					boat.scale.set(0.25, 0.25, 0.25);
+					boat.children[0].material = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("4727355663_b52966c3e6_b.jpg"), shininess: 1, side:THREE.DoubleSide});
+					console.log(boat);
 				},
 				function (xhr) { console.log((xhr.loaded / xhr.total * 100) + "% loaded" ); },
 				function (error) { console.error(error); }
