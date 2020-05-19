@@ -66,6 +66,7 @@
 		<script>
 			// setup the scene
 			var scene = new THREE.Scene();
+			scene.background = THREE.ImageUtils.loadTexture("clouds-571350_1280.jpg");
 			var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize(window.innerWidth, window.innerHeight);
@@ -84,9 +85,9 @@
 			let uniforms = {
 				scale1: {type: "f", value: 1.7},
 				scale2: {type: "f", value: 1.5},
-				range1: {type: "v2", value: new THREE.Vector2(0.0, 0.15)},
-				range2: {type: "v2", value: new THREE.Vector2(0.25, 0.35)},
-				range3: {type: "v3", value: new THREE.Vector2(0.4, 0.5)},
+				range1: {type: "v2", value: new THREE.Vector2(0.05, 0.15)},
+				range2: {type: "v2", value: new THREE.Vector2(0.175, 0.35)},
+				range3: {type: "v2", value: new THREE.Vector2(0.4, 0.5)},
 				texture1: {type: "t", value: THREE.ImageUtils.loadTexture("4c712fb1f820b43b1b8eac593302af6c.jpg")},
 				texture2: {type: "t", value: THREE.ImageUtils.loadTexture("unnamed.jpg")},
 				texture3: {type: "t", value: THREE.ImageUtils.loadTexture("clay_snow1.jpg")},
@@ -100,17 +101,18 @@
 				fragmentShader: document.getElementById("fragmentShader").textContent
 			});
 			
-			var plane = new THREE.Mesh(new THREE.PlaneGeometry(12, 12, 100, 100), material);
+			var plane = new THREE.Mesh(new THREE.PlaneGeometry(12, 12, 120, 120), material);
 			plane.position.set(0, 2, 0);
 			plane.rotation.x = -Math.PI / 2;
 			scene.add(plane);
 
 
 			const mat = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("WaterPlain0012_1_download600.jpg"), normalMap: THREE.ImageUtils.loadTexture("water normal.jpg"), shininess:100, side:THREE.FrontSide})
-			var p = new THREE.PlaneGeometry(20, 20, 50, 50);
+			var p = new THREE.PlaneGeometry(20, 20, 60, 60);
 			var waterPlane = new THREE.Mesh(p, mat);
 			waterPlane.rotation.x = -Math.PI / 2;
 			waterPlane.position.y = 2.125;
+			waterPlane.scale.set(1.5, 1, 1.5);
 			scene.add(waterPlane);
 
 			var matShader;
@@ -125,9 +127,9 @@
 				const token = '#include <begin_vertex>'
 				const customTransform = `
 					vec3 transformed = vec3(position);
-					float amp = 0.05;
+					float amp = 0.04;
 					float noiseValue = 1.0 + texture2D(noise, vec2(0.5 + (position.x / 20.0), 0.5 + (position.y / 20.0))).x;
-					float freq = 2.0 * noiseValue;
+					float freq = 1.5 * noiseValue;
 					float angle1 = ((time + position.x) * freq);
 					float angle2 = ((time + position.y) * freq);
 					transformed.z += (sin(angle1) * amp) + (cos(angle2) * amp);
@@ -151,7 +153,7 @@
 					scene.add(boat);
 					boat.position.set(3, 0, 0);
 					boat.scale.set(0.25, 0.25, 0.25);
-					boat.children[0].material = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("4727355663_b52966c3e6_b.jpg"), shininess: 1, side:THREE.FrontSide});
+					boat.children[0].material = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("4727355663_b52966c3e6_b.jpg"), shininess: 20, side:THREE.FrontSide});
 				},
 				function (xhr) { console.log((xhr.loaded / xhr.total * 100) + "% loaded" ); },
 				function (error) { console.error(error); }
@@ -173,9 +175,9 @@
 				function (gltf) {
 					whale = gltf.scene
 					scene.add(whale);
-					whale.position.set(3, 0, 0);
+					whale.position.set(2, 0, 0);
 					whale.scale.set(0.05, 0.05, 0.05);
-					whale.children[0].material = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("173b.JPG"), shininess: 1, side:THREE.FrontSide});
+					whale.children[0].material = new THREE.MeshPhongMaterial({color: 0x301055, shininess: 50, side:THREE.FrontSide});
 				},
 				function (xhr) { console.log((xhr.loaded / xhr.total * 100) + "% loaded" ); },
 				function (error) { console.error(error); }
@@ -197,7 +199,7 @@
 				}
 
 				if(whale) {
-					whale.position.y = -16 + Math.sin(mil / 5000);
+					whale.position.y = -16 + (0.5 * Math.sin(mil / 5000));
 				}
 
 				camera.position.set(12 * Math.cos(mil / 5000), 5, 12 * Math.sin(mil / 5000));
