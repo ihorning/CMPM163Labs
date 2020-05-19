@@ -12,10 +12,16 @@
 		<script src="../three.js-master/build/three.js"></script>
 		<script id="vertexShader" type="x-shader/x-vertex">
 			// code for vertex shader
+
+			uniform sampler2D heightMap1;
+
 			varying vec2 vUv;
+
 			void main() {
 				vUv = uv;
-				vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+				vec4 heightColor = texture2D(heightMap1, uv);
+				vec3 newPosition = position + (normal * 1.0 * heightColor.r);
+				vec4 modelViewPosition = modelViewMatrix * vec4(newPosition, 1.0);
 				gl_Position = projectionMatrix * modelViewPosition;
 			}
 		</script>
@@ -47,16 +53,25 @@
 
 
 			let uniforms = {
-				texture1: {type: "t", value: THREE.ImageUtils.loadTexture("eb5f6e6dfa1bea397aa317d53e47f5d8--texture-seamless-rust.jpg")},
-				heightMap: {type: "t", value: THREE.ImageUtils.loadTexture("Sc2wB.jpg")}
+				//texture1: {type: "t", value: THREE.ImageUtils.loadTexture("eb5f6e6dfa1bea397aa317d53e47f5d8--texture-seamless-rust.jpg")},
+				texture1: {type: "t", value: THREE.ImageUtils.loadTexture("1Eb5w.jpg")},
+				//texture1: {type: "t", value: THREE.ImageUtils.loadTexture("unnamed.jpg")},
+				//heightMap1: {type: "t", value: THREE.ImageUtils.loadTexture("Sc2wB.jpg")}
+				//heightMap1: {type: "t", value: THREE.ImageUtils.loadTexture("1182OS_02_05.jpg")}
+				heightMap1: {type: "t", value: THREE.ImageUtils.loadTexture("volcano-height-map-258-0_large.png")}
 			}
-
 			let material = new THREE.ShaderMaterial({
 				uniforms: uniforms,
 				vertexShader: document.getElementById("vertexShader").textContent,
 				fragmentShader: document.getElementById("fragmentShader").textContent
 			});
 			
+			var plane = new THREE.Mesh(new THREE.PlaneGeometry(10, 10, 200, 200), material);
+			plane.position.set(0, -1, -10);
+			plane.rotation.x = -Math.PI / 2;
+			scene.add(plane);
+
+
 			function animate(time) {
 				renderer.render(scene, camera);
 			}
