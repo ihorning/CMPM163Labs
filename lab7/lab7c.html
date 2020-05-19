@@ -31,7 +31,7 @@
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
 			// code for fragment shader
-
+	
 			uniform sampler2D texture1;
 			uniform sampler2D texture2;
 			uniform sampler2D texture3;
@@ -45,19 +45,21 @@
 			varying vec2 vUv;
 
 			void main() {
+				vec4 color = vec4(1.0);
 				// Use height from the heightmap and the range to determine the weight of texture1 and texture2
 				float height = texture2D(heightMap1, vUv).x + texture2D(heightMap2, vUv).x;
 				height = height * 0.5;
 				if(height < range1.y) {
 					height = smoothstep(range1.x, range1.y, height);
-					gl_FragColor = ((1.0 - height) * texture2D(texture1, vUv)) + ((height) * texture2D(texture2, vUv));
+					color = ((1.0 - height) * texture2D(texture1, vUv)) + ((height) * texture2D(texture2, vUv));
 				} else if(height < range2.y) {
 					height = smoothstep(range2.x, range2.y, height);
-					gl_FragColor = ((1.0 - height) * texture2D(texture2, vUv)) + ((height) * texture2D(texture3, vUv));
+					color = ((1.0 - height) * texture2D(texture2, vUv)) + ((height) * texture2D(texture3, vUv));
 				} else {
 					height = smoothstep(range3.x, range3.y, height);
-					gl_FragColor = ((1.0 - height) * texture2D(texture3, vUv)) + ((height) * texture2D(texture4, vUv));
+					color = ((1.0 - height) * texture2D(texture3, vUv)) + ((height) * texture2D(texture4, vUv));
 				}
+				gl_FragColor = color;
 			}
 		</script>
 		<script>
@@ -73,7 +75,7 @@
 			camera.rotation.x = 0;
 
 			const light = new THREE.DirectionalLight(0xffffff, 1.0);
-			light.position.set(1,1,1).normalize();
+			light.position.set(1,1,1);
 			scene.add(light);
 			scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
@@ -103,7 +105,7 @@
 			scene.add(plane);
 
 
-			const mat = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("WaterPlain0012_1_download600.jpg"), shininess:100, side:THREE.DoubleSide})
+			const mat = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("WaterPlain0012_1_download600.jpg"), normalMap: THREE.ImageUtils.loadTexture("water normal.jpg"), shininess:100, side:THREE.DoubleSide})
 			var p = new THREE.PlaneGeometry(20, 20, 50, 50);
 			var waterPlane = new THREE.Mesh(p, mat);
 			waterPlane.rotation.x = -Math.PI / 2;
@@ -122,9 +124,9 @@
 				const token = '#include <begin_vertex>'
 				const customTransform = `
 					vec3 transformed = vec3(position);
-					float amp = 0.025;
+					float amp = 0.03;
 					float noiseValue = 1.0 + texture2D(noise, vec2(0.5 + (position.x / 20.0), 0.5 + (position.y / 20.0))).x;
-					float freq = 3.0 * noiseValue;
+					float freq = 2.0 * noiseValue;
 					float angle1 = ((time + position.x) * freq);
 					float angle2 = ((time + position.y) * freq);
 					transformed.z += (sin(angle1) * amp) + (cos(angle2) * amp);
