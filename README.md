@@ -64,3 +64,6 @@ Here is the textured screenshot. I made it interpolate between two textures base
 ![](lab7/lab7_capture1.PNG)
 Here is just the heightmap used as the texture.
 ![](lab7/lab7_capture2.PNG)
+
+Part 2b:
+https://drive.google.com/file/d/10PggDjK78I28tHiREZk6S9UsxX5JmxT2/view?usp=sharing

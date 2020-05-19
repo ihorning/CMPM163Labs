@@ -19,15 +19,15 @@
 			document.body.appendChild(renderer.domElement);
 
 				// add two point lights
-			const light = new THREE.PointLight(0xffffff, 1.0);
+			const light = new THREE.PointLight(0xaaccff, 1.0);
 			light.position.set(-10,5,-25);
 			scene.add(light);
-			const light2 = new THREE.PointLight(0xffffff, 1.0);
+			const light2 = new THREE.PointLight(0x00ffff, 1.0);
 			light2.position.set(0,5,-25);
 			scene.add(light2);
 
 
-			const mat = new THREE.MeshPhongMaterial({color:0x2288ff, shininess:100, side:THREE.DoubleSide})
+			const mat = new THREE.MeshPhongMaterial({color:0x2288ff, shininess:50, side:THREE.DoubleSide})
 			var p = new THREE.PlaneGeometry(20, 20, 100, 100);
 			var plane = new THREE.Mesh(p, mat);
 			plane.position.z = -20;
@@ -49,6 +49,9 @@
 					float amp = 0.1;
 					float angle = (time + position.x)*freq;
 					transformed.z += sin(angle)*amp;
+					objectNormal = normalize(vec3(-amp * freq * cos(angle),0.0,1.0));
+					vNormal = normalMatrix * objectNormal;
+
 				`
 				shader.vertexShader = shader.vertexShader.replace(token,customTransform)
 				matShader = shader
@@ -58,6 +61,9 @@
 
 			function animate(time) {
 				requestAnimationFrame(animate);
+
+				if(matShader) matShader.uniforms.time.value = time/1000;
+
 				renderer.render(scene, camera);
 			}
 			renderer.setAnimationLoop(animate)
