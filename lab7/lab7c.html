@@ -14,14 +14,16 @@
 			// code for vertex shader
 
 			uniform sampler2D heightMap1;
-			uniform float scale;
+			uniform sampler2D heightMap2;
+			uniform float scale1;
+			uniform float scale2;
 
 			varying vec2 vUv;
 
 			void main() {
 				vUv = uv;
-				vec4 heightColor = texture2D(heightMap1, uv);
-				vec3 newPosition = position + (normal * scale * heightColor.r);
+				vec4 heightColor = (scale1 * texture2D(heightMap1, uv)) + (scale2 * texture2D(heightMap2, uv));
+				vec3 newPosition = position + (normal * heightColor.r);
 				vec4 modelViewPosition = modelViewMatrix * vec4(newPosition, 1.0);
 				gl_Position = projectionMatrix * modelViewPosition;
 			}
@@ -32,16 +34,30 @@
 
 			uniform sampler2D texture1;
 			uniform sampler2D texture2;
+			uniform sampler2D texture3;
+			uniform sampler2D texture4;
 			uniform sampler2D heightMap1;
-			uniform vec2 range;
+			uniform sampler2D heightMap2;
+			uniform vec2 range1;
+			uniform vec2 range2;
+			uniform vec2 range3;
 
 			varying vec2 vUv;
 
 			void main() {
 				// Use height from the heightmap and the range to determine the weight of texture1 and texture2
-				float height = texture2D(heightMap1, vUv).x;
-				height = smoothstep(range.x, range.y, height);
-				gl_FragColor = ((1.0 - height) * texture2D(texture1, vUv)) + ((height) * texture2D(texture2, vUv));
+				float height = texture2D(heightMap1, vUv).x + texture2D(heightMap2, vUv).x;
+				height = height * 0.5;
+				if(height < range1.y) {
+					height = smoothstep(range1.x, range1.y, height);
+					gl_FragColor = ((1.0 - height) * texture2D(texture1, vUv)) + ((height) * texture2D(texture2, vUv));
+				} else if(height < range2.y) {
+					height = smoothstep(range2.x, range2.y, height);
+					gl_FragColor = ((1.0 - height) * texture2D(texture2, vUv)) + ((height) * texture2D(texture3, vUv));
+				} else {
+					height = smoothstep(range3.x, range3.y, height);
+					gl_FragColor = ((1.0 - height) * texture2D(texture3, vUv)) + ((height) * texture2D(texture4, vUv));
+				}
 			}
 		</script>
 		<script>
@@ -52,9 +68,9 @@
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			document.body.appendChild(renderer.domElement);
 
-			camera.position.y = 5;
+			camera.position.y = 0;
 			camera.position.z = 0;
-			camera.rotation.x = -.5;
+			camera.rotation.x = 0;
 
 			const light = new THREE.DirectionalLight(0xffffff, 1.0);
 			light.position.set(1,1,1).normalize();
@@ -63,11 +79,17 @@
 
 
 			let uniforms = {
-				scale: {type: "f", value: 1.5},
-				range: {type: "v2", value: new THREE.Vector2(0.15, 0.3)},
-				texture1: {type: "t", value: THREE.ImageUtils.loadTexture("unnamed.jpg")},
-				texture2: {type: "t", value: THREE.ImageUtils.loadTexture("snow.jpg")},
-				heightMap1: {type: "t", value: THREE.ImageUtils.loadTexture("volcano-height-map-258-0_large.png")}
+				scale1: {type: "f", value: 1.7},
+				scale2: {type: "f", value: 1.5},
+				range1: {type: "v2", value: new THREE.Vector2(0.0, 0.15)},
+				range2: {type: "v2", value: new THREE.Vector2(0.25, 0.35)},
+				range3: {type: "v3", value: new THREE.Vector2(0.4, 0.5)},
+				texture1: {type: "t", value: THREE.ImageUtils.loadTexture("4c712fb1f820b43b1b8eac593302af6c.jpg")},
+				texture2: {type: "t", value: THREE.ImageUtils.loadTexture("unnamed.jpg")},
+				texture3: {type: "t", value: THREE.ImageUtils.loadTexture("clay_snow1.jpg")},
+				texture4: {type: "t", value: THREE.ImageUtils.loadTexture("snow.jpg")},
+				heightMap1: {type: "t", value: THREE.ImageUtils.loadTexture("unnamed.png")},
+				heightMap2: {type: "t", value: THREE.ImageUtils.loadTexture("mask_with_height.png")}
 			}
 			let material = new THREE.ShaderMaterial({
 				uniforms: uniforms,
@@ -75,13 +97,54 @@
 				fragmentShader: document.getElementById("fragmentShader").textContent
 			});
 			
-			var plane = new THREE.Mesh(new THREE.PlaneGeometry(12, 12, 400, 400), material);
-			plane.position.set(0, -1, -10);
+			var plane = new THREE.Mesh(new THREE.PlaneGeometry(12, 12, 100, 100), material);
+			plane.position.set(0, 2, 0);
 			plane.rotation.x = -Math.PI / 2;
 			scene.add(plane);
 
 
+			const mat = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("WaterPlain0012_1_download600.jpg"), shininess:100, side:THREE.DoubleSide})
+			var p = new THREE.PlaneGeometry(20, 20, 50, 50);
+			var waterPlane = new THREE.Mesh(p, mat);
+			waterPlane.rotation.x = -Math.PI / 2;
+			waterPlane.position.y = 2.125;
+			scene.add(waterPlane);
+
+			var matShader;
+			mat.onBeforeCompile = (shader) => {
+				shader.uniforms.time = {value: 0};
+				shader.uniforms.noise = {type: "t", value: THREE.ImageUtils.loadTexture("noise1.png")};
+				shader.vertexShader = `
+					uniform float time;
+					uniform sampler2D noise;
+				` + shader.vertexShader
+		
+				const token = '#include <begin_vertex>'
+				const customTransform = `
+					vec3 transformed = vec3(position);
+					float amp = 0.025;
+					float noiseValue = 1.0 + texture2D(noise, vec2(0.5 + (position.x / 20.0), 0.5 + (position.y / 20.0))).x;
+					float freq = 3.0 * noiseValue;
+					float angle1 = ((time + position.x) * freq);
+					float angle2 = ((time + position.y) * freq);
+					transformed.z += (sin(angle1) * amp) + (cos(angle2) * amp);
+					objectNormal = normalize(vec3(-amp * freq * cos(angle1), -amp * freq * sin(angle2), 1.0));
+					vNormal = normalMatrix * objectNormal;
+
+				`
+				shader.vertexShader = shader.vertexShader.replace(token,customTransform)
+				matShader = shader
+			}
+
 			function animate(time) {
+				requestAnimationFrame(animate);
+
+				let mil = new Date().getTime();
+				camera.position.set(12 * Math.cos(mil / 2000), 5, 12 * Math.sin(mil / 2000));
+				camera.rotation.y = (Math.PI / 2) - (mil / 2000);
+
+				if(matShader) matShader.uniforms.time.value = time / 500;
+
 				renderer.render(scene, camera);
 			}
 			renderer.setAnimationLoop(animate)
