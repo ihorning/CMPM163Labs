@@ -57,3 +57,10 @@ For my custom particle effect, I have each particle assigned another particle to
 Link to Shadertoy: https://www.shadertoy.com/view/WdBBRR
 
 Here's a neat project someone else made that visualizes audio with a clay pot on a pottery wheel: https://www.shadertoy.com/view/4sf3DB
+
+## Lab 7 (Part 2)
+Part 2a:
+Here is the textured screenshot. I made it interpolate between two textures based on height.
+![](lab7/lab7_capture1.PNG)
+Here is just the heightmap used as the texture.
+![](lab7/lab7_capture2.PNG)
