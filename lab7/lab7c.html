@@ -78,7 +78,7 @@
 			const light = new THREE.DirectionalLight(0xffffff, 1.0);
 			light.position.set(1,1,1);
 			scene.add(light);
-			scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+			scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
 
 			let uniforms = {
@@ -106,7 +106,7 @@
 			scene.add(plane);
 
 
-			const mat = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("WaterPlain0012_1_download600.jpg"), normalMap: THREE.ImageUtils.loadTexture("water normal.jpg"), shininess:100, side:THREE.DoubleSide})
+			const mat = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("WaterPlain0012_1_download600.jpg"), normalMap: THREE.ImageUtils.loadTexture("water normal.jpg"), shininess:100, side:THREE.FrontSide})
 			var p = new THREE.PlaneGeometry(20, 20, 50, 50);
 			var waterPlane = new THREE.Mesh(p, mat);
 			waterPlane.rotation.x = -Math.PI / 2;
@@ -125,7 +125,7 @@
 				const token = '#include <begin_vertex>'
 				const customTransform = `
 					vec3 transformed = vec3(position);
-					float amp = 0.03;
+					float amp = 0.05;
 					float noiseValue = 1.0 + texture2D(noise, vec2(0.5 + (position.x / 20.0), 0.5 + (position.y / 20.0))).x;
 					float freq = 2.0 * noiseValue;
 					float angle1 = ((time + position.x) * freq);
@@ -142,17 +142,40 @@
 
 			var loader = new THREE.GLTFLoader();
 
-			var boat;
+			var boat, rabbit, whale;
 
 			loader.load(
 				"Wood_Boat.glb",
 				function (gltf) {
 					boat = gltf.scene;
-					scene.add(gltf.scene);
+					scene.add(boat);
 					boat.position.set(3, 0, 0);
 					boat.scale.set(0.25, 0.25, 0.25);
-					boat.children[0].material = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("4727355663_b52966c3e6_b.jpg"), shininess: 1, side:THREE.DoubleSide});
-					console.log(boat);
+					boat.children[0].material = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("4727355663_b52966c3e6_b.jpg"), shininess: 1, side:THREE.FrontSide});
+				},
+				function (xhr) { console.log((xhr.loaded / xhr.total * 100) + "% loaded" ); },
+				function (error) { console.error(error); }
+			);
+			loader.load(
+				"rabbit.glb",
+				function (gltf) {
+					rabbit = gltf.scene
+					scene.add(rabbit);
+					rabbit.position.set(3, 3, 0);
+					rabbit.scale.set(0.015, 0.015, 0.015);
+					rabbit.children[0].material = new THREE.MeshStandardMaterial({map: THREE.ImageUtils.loadTexture("198.JPG"), roughness: 0.1, emissive: 0x606030, metalness: 1.0, side:THREE.FrontSide});
+				},
+				function (xhr) { console.log((xhr.loaded / xhr.total * 100) + "% loaded" ); },
+				function (error) { console.error(error); }
+			);
+			loader.load(
+				"whale.glb",
+				function (gltf) {
+					whale = gltf.scene
+					scene.add(whale);
+					whale.position.set(3, 0, 0);
+					whale.scale.set(0.05, 0.05, 0.05);
+					whale.children[0].material = new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture("173b.JPG"), shininess: 1, side:THREE.FrontSide});
 				},
 				function (xhr) { console.log((xhr.loaded / xhr.total * 100) + "% loaded" ); },
 				function (error) { console.error(error); }
@@ -166,10 +189,19 @@
 				if(boat) {
 					boat.position.set(7 * Math.cos(-mil / 4000), 2.25, 7 * Math.sin(-mil / 4000));
 					boat.rotation.y = Math.PI + (mil / 4000);
+
+					if(rabbit) {
+						rabbit.position.set(boat.position.x, boat.position.y + 0.05, boat.position.z);
+						rabbit.rotation.set(boat.rotation.x, boat.rotation.y, boat.rotation.z);
+					}
 				}
 
-				camera.position.set(12 * Math.cos(mil / 2000), 5, 12 * Math.sin(mil / 2000));
-				camera.rotation.y = (Math.PI / 2) - (mil / 2000);
+				if(whale) {
+					whale.position.y = -16 + Math.sin(mil / 5000);
+				}
+
+				camera.position.set(12 * Math.cos(mil / 5000), 5, 12 * Math.sin(mil / 5000));
+				camera.rotation.y = (Math.PI / 2) - (mil / 5000);
 
 				if(matShader) matShader.uniforms.time.value = time / 500;
 
