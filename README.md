@@ -68,4 +68,9 @@ Here is just the heightmap used as the texture.
 
 Part 2b:
 
+Wavy blue plane:
 https://drive.google.com/file/d/10PggDjK78I28tHiREZk6S9UsxX5JmxT2/view?usp=sharing
+
+Creative scene:
+https://drive.google.com/file/d/1Qzc0GXu0UQPV2l3XfPAMCXIGzGn8WvkP/view?usp=sharing
+![](lab7/lab7_capture3.PNG)
