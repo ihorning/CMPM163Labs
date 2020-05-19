@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Lab 7: Mesh Manipulation</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+		<script src="../three.js-master/build/three.js"></script>
+		<script id="vertexShader" type="x-shader/x-vertex">
+			// code for vertex shader
+
+			uniform sampler2D heightMap1;
+			uniform float scale;
+
+			varying vec2 vUv;
+
+			void main() {
+				vUv = uv;
+				vec4 heightColor = texture2D(heightMap1, uv);
+				vec3 newPosition = position + (normal * scale * heightColor.r);
+				vec4 modelViewPosition = modelViewMatrix * vec4(newPosition, 1.0);
+				gl_Position = projectionMatrix * modelViewPosition;
+			}
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			// code for fragment shader
+
+			uniform sampler2D texture1;
+			uniform sampler2D texture2;
+			uniform sampler2D heightMap1;
+			uniform vec2 range;
+
+			varying vec2 vUv;
+
+			void main() {
+				// Use height from the heightmap and the range to determine the weight of texture1 and texture2
+				float height = texture2D(heightMap1, vUv).x;
+				height = smoothstep(range.x, range.y, height);
+				gl_FragColor = ((1.0 - height) * texture2D(texture1, vUv)) + ((height) * texture2D(texture2, vUv));
+			}
+		</script>
+		<script>
+			// setup the scene
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+
+			camera.position.y = 5;
+			camera.position.z = 0;
+			camera.rotation.x = -.5;
+
+			const light = new THREE.DirectionalLight(0xffffff, 1.0);
+			light.position.set(1,1,1).normalize();
+			scene.add(light);
+			scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+
+
+			let uniforms = {
+				scale: {type: "f", value: 1.5},
+				range: {type: "v2", value: new THREE.Vector2(0.15, 0.3)},
+				texture1: {type: "t", value: THREE.ImageUtils.loadTexture("volcano-height-map-258-0_large.png")},
+				texture2: {type: "t", value: THREE.ImageUtils.loadTexture("volcano-height-map-258-0_large.png")},
+				heightMap1: {type: "t", value: THREE.ImageUtils.loadTexture("volcano-height-map-258-0_large.png")}
+			}
+			let material = new THREE.ShaderMaterial({
+				uniforms: uniforms,
+				vertexShader: document.getElementById("vertexShader").textContent,
+				fragmentShader: document.getElementById("fragmentShader").textContent
+			});
+			
+			var plane = new THREE.Mesh(new THREE.PlaneGeometry(12, 12, 400, 400), material);
+			plane.position.set(0, -1, -10);
+			plane.rotation.x = -Math.PI / 2;
+			scene.add(plane);
+
+
+			function animate(time) {
+				renderer.render(scene, camera);
+			}
+			renderer.setAnimationLoop(animate)
+		</script>
+	</body>
+</html>
