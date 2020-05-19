@@ -10,6 +10,7 @@
 	</head>
 	<body>
 		<script src="../three.js-master/build/three.js"></script>
+		<script src="../three.js-master/examples/js/loaders/GLTFLoader.js"></script>
 		<script id="vertexShader" type="x-shader/x-vertex">
 			// code for vertex shader
 
@@ -138,10 +139,34 @@
 				matShader = shader
 			}
 
+
+			var loader = new THREE.GLTFLoader();
+
+			var boat;
+
+			loader.load(
+				"Wood_Boat.glb",
+				function (gltf) {
+					boat = gltf.scene;
+					console.log(boat);
+					scene.add(gltf.scene);
+					boat.position.set(3, 0, 0);
+					boat.scale.set(0.25, 0.25, 0.25);
+				},
+				function (xhr) { console.log((xhr.loaded / xhr.total * 100) + "% loaded" ); },
+				function (error) { console.error(error); }
+			);
+
 			function animate(time) {
 				requestAnimationFrame(animate);
 
 				let mil = new Date().getTime();
+
+				if(boat) {
+					boat.position.set(7 * Math.cos(-mil / 4000), 2.25, 7 * Math.sin(-mil / 4000));
+					boat.rotation.y = Math.PI + (mil / 4000);
+				}
+
 				camera.position.set(12 * Math.cos(mil / 2000), 5, 12 * Math.sin(mil / 2000));
 				camera.rotation.y = (Math.PI / 2) - (mil / 2000);
 
