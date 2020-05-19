@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Lab 7: Mesh Manipulation</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+		<script src="../three.js-master/build/three.js"></script>
+		<script id="vertexShader" type="x-shader/x-vertex">
+			// code for vertex shader
+			varying vec2 vUv;
+			void main() {
+				vUv = uv;
+				vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+				gl_Position = projectionMatrix * modelViewPosition;
+			}
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			// code for fragment shader
+			uniform sampler2D texture1;
+			varying vec2 vUv;
+			void main() {
+				gl_FragColor = texture2D(texture1, vUv);
+			}
+		</script>
+		<script>
+			// setup the scene
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+
+			camera.position.y = 5;
+			camera.position.z = 0;
+			camera.rotation.x = -.5;
+
+			const light = new THREE.DirectionalLight(0xffffff, 1.0);
+			light.position.set(1,1,1).normalize();
+			scene.add(light);
+			scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+
+
+			let uniforms = {
+				texture1: {type: "t", value: THREE.ImageUtils.loadTexture("eb5f6e6dfa1bea397aa317d53e47f5d8--texture-seamless-rust.jpg")},
+				heightMap: {type: "t", value: THREE.ImageUtils.loadTexture("Sc2wB.jpg")}
+			}
+
+			let material = new THREE.ShaderMaterial({
+				uniforms: uniforms,
+				vertexShader: document.getElementById("vertexShader").textContent,
+				fragmentShader: document.getElementById("fragmentShader").textContent
+			});
+			
+			function animate(time) {
+				renderer.render(scene, camera);
+			}
+			renderer.setAnimationLoop(animate)
+		</script>
+	</body>
+</html>
