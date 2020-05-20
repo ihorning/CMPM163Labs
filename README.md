@@ -74,3 +74,6 @@ https://drive.google.com/file/d/10PggDjK78I28tHiREZk6S9UsxX5JmxT2/view?usp=shari
 Creative scene:
 https://drive.google.com/file/d/1Qzc0GXu0UQPV2l3XfPAMCXIGzGn8WvkP/view?usp=sharing
 ![](lab7/lab7_capture3.PNG)
+
+My lab partner, Giancarlo Tomasello, did part 1 of this lab. He created a mountain scene with some water moving in gentle waves in little ponds. The scene is divided into two different colors of lighting (by using a color gradient node and position node in Unity shader graph). The distorted mesh floats above the landscape like a little cloud, and it moves back and forth between the two colors.
+We didn't help each other with the lab.
