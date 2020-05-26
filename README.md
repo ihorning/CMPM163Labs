@@ -82,12 +82,17 @@ We didn't help each other with the lab.
 My procedurally generated city is inspired by various city plans/buildings by Le Corbusier.
 Here are a couple of pictures of his "Plan Voisin," a plan for reconstructing Paris:
 ![](lab8/Plan_Voisin_model.jpg)
-![](lab8/unnamed (1).jpg)
+![](lab8/plan-voisin.jpg)
 ![](lab8/unnamed.jpg)
+
 Most of the building models I used are based on those seen in the Plan Voisin, and the arrangement of them (the + buildings in a rectangle, the w-like ones around, the rectangle gardens bordering those, etc.) are based on these models.
+
 Here is a picture of his proposed "Obus" plan for the port of Algiers:
 ![](lab8/6_115_feature.jpg)
+
 This plan included a giant bridge made up of many stories of residential prefabricated rooms and a giant highway lifted high above the ground that meets the top of the bridge. My generated city includes a large bridge structure with a highway ramping up to its top based on this.
+
 The reason I made some of the towers colorful was because of Le Corbusier's "Quartiers Modernes Fruges":
 ![](lab8/Quartiers-Modernes-Frugès-Le-Corbusier.jpg)
+
 After construction, some of the residents decided to paint their homes in colors to personalize them. I thought bringing this color to my city made it look more interesting.
