@@ -11,6 +11,68 @@
 	<body>
 		<script src="../three.js-master/build/three.js"></script>
 		<script>
+
+			// this function loads the context for the canvas
+			function initContext(canvasID, contextType) {
+				var canvas = document.createElement('canvas');
+				var context = canvas.getContext(contextType);
+				return context;
+			}
+
+			// this loads the image, but mainly, when the image loads, it calls readImage()
+			function loadImage(imageSource, context) {
+				var imageObj = new Image();
+				imageObj.onload = function() {
+					context.drawImage(imageObj, 0, 0);
+					// get image data samples each pixel from the first two  x,y coordinates 
+					// to the latter two
+					var imageData = context.getImageData(0,0,planeSize,planeSize);
+					readImage(imageData);
+				};
+				imageObj.src = imageSource;
+			}
+
+			// since this method is only called when the image is loaded, 
+			//we know we have the image pixel data
+			function readImage(imageData) {
+				// since the imageData.data looks like this [r0, g0, b0, a0, r1, g1, b1, a1…]
+				// and since our noise is greyscale (rgb are all the same number)
+				// we only need every fourth number to collect all the red values
+				var noiseData = [];
+				var minVal = 255;
+				var maxVal = 0;
+				for(var i = 0; i < imageData.data.length; i+=4) {
+					noiseData.push(imageData.data[i]); // just saving red component
+					if(imageData.data[i] < minVal) minVal = imageData.data[i];
+					if(imageData.data[i] > maxVal) maxVal = imageData.data[i];
+				}
+
+				// now noiseData is a list of semi-random values from 0 to 255
+				// building generation code will go here:
+				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
+					for(var c = -planeSize / 2; c < planeSize / 2; c++) {
+						var geometry = new THREE.BoxGeometry();
+						var material = new THREE.MeshPhongMaterial({ color:0x00ff00 });
+						var cube = new THREE.Mesh(geometry, material);
+						// This index should grab the color at row r and column c
+						let noiseIndex = Math.floor(noiseData.length * (r + (planeSize / 2)) / planeSize) + Math.floor(Math.sqrt(noiseData.length) * (c + (planeSize / 2)) / planeSize);
+						// Scale the value
+						cube.scale.y = 5 * (5 + ((noiseData[noiseIndex] - minVal) % 64)) / 64;
+						cube.scale.x = 0.7;
+						cube.scale.z = 0.7;
+						cube.position.z = planeCenter.z + c + cube.scale.z / 2;
+						cube.position.x = r + cube.scale.x / 2;
+						cube.position.y = planeCenter.y + cube.scale.y / 2;
+						scene.add(cube);
+					}
+				}
+			}
+
+			var context = initContext('canvas','2d'); // initialize the canvas
+			loadImage('perlin_34_34.jpg',context); // load the perlin image
+
+
+
 			// setup the scene
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -31,21 +93,6 @@
 			plane.position.y = planeCenter.y;
 			plane.rotation.x = Math.PI/2;
 			scene.add(plane);
-
-			for(var r = -planeSize / 2; r < planeSize / 2; r++) {
-				for(var c = -planeSize / 2; c < planeSize / 2; c++) {
-					var geometry = new THREE.BoxGeometry();
-					var material = new THREE.MeshPhongMaterial({ color:0x00ff00 });
-					var cube = new THREE.Mesh(geometry, material);
-					cube.scale.y = Math.random() * 10;
-					cube.scale.x = 0.7;
-					cube.scale.z = 0.7;
-					cube.position.z = planeCenter.z + c + cube.scale.z / 2;
-					cube.position.x = r + cube.scale.x / 2;
-					cube.position.y = planeCenter.y + cube.scale.y / 2;
-					scene.add(cube);
-				}
-			}
 
 			// add the lights all around the city
 			for(var a = 270; a < 270 * 2; a+=100) {
