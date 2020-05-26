@@ -65,6 +65,8 @@
 
 				// now noiseData is a list of semi-random values from 0 to 255
 				// building generation code will go here:
+				let tileScale = 0.9;
+
 				var tileInfo = [];
 				var bridgeAvg = 0, bridgeCount = 0;
 				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
@@ -89,8 +91,6 @@
 							0, 0, 0, 1
 						);
 						geometry.applyMatrix4(skewMatrix);
-
-						let tileScale = 0.9;
 
 						tileInfo[r][c] = [
 							r + ((c * s) % 1) + tileScale / 2,
@@ -185,6 +185,22 @@
 						scene.add(building);
 					}
 				}
+
+				let highwayLength = (planeSize / 2) - bridgeAvg;
+				var highwayGeometry = new THREE.BoxGeometry(highwayLength, 0.1, 2 * (1 - tileScale));
+				//highwayGeometry.rotateX(-Math.PI / 2);
+				let highwaySkew = new THREE.Matrix4();
+				highwaySkew.set(
+					1, 0, 0, 0,
+					-1 / highwayLength, 1, 0, 0,
+					0, 0, 1, 0,
+					0, 0, 0, 1
+				);
+				highwayGeometry.applyMatrix4(highwaySkew);
+
+				var highway = new THREE.Mesh(highwayGeometry, mat);
+				highway.position.set(bridgeAvg + (highwayLength / 2), planeCenter.y + 0.5, planeCenter.z + Math.floor(planeSize / 4));
+				scene.add(highway);
 			}
 
 
