@@ -120,6 +120,8 @@
 						}
 						tileInfo[r][c][3] = type;
 
+						tileInfo[r][c][4] = Math.sqrt((r * r) + (c * c));
+
 						let material;
 						if(type != "i1" && type != "i2" && type != "t") {
 							material = grassMaterial;
@@ -154,15 +156,19 @@
 
 						if(type == "f") continue;
 
+						var material = concreteMaterial;
 						var geometry = geometryDict[type];
 						if(type == "t") {
+							let tVal = (value - 0.6) / (0.7 - 0.6);
+
 							geometry = geometry.clone();
-							let h = value > 0.65 ? 3 : 7;
+							let h = tVal > 0.5 ? 3 : 7;
 							geometry.scale(1.25, h, 1.25);
 							geometry.translate(0, h / 2, 0);
+
+							if(tileInfo[r][c][4] > planeSize / 3 && tVal % 0.5 > 0.25) material = new THREE.MeshPhongMaterial({ color: new THREE.Color().setHSL(tVal, 0.25, 0.6) });
 						}
 
-						var material = new THREE.MeshPhongMaterial({ color: new THREE.Color(value, value, value) });
 						var building = new THREE.Mesh(geometry, material);
 						
 						if(type != "br") {
