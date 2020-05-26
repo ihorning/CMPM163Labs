@@ -109,18 +109,18 @@
 							bridgeAvg += tileInfo[r][c][0];
 						} else if(tileInfo[r][c][4] > planeSize * 0.5) {
 							type = "t2";
-						} else if(value < 0.3) {
+						} else if(Math.abs(r) <= 3 && Math.abs(c) <= 2) {
+							type = "b1";
+						}else if(value < 0.3) {
 							type = "i2";
 						} else if(value < 0.4) {
 							type = "i1";
 						} else if(value < 0.5) {
 							type = "g1";
-						} else if(value < 0.6) {
-							type = "b2";
 						} else if(value < 0.7) {
 							type = "t1";
-						} else {
-							type = "b1";
+						} else if(tileInfo[r][c][4] < planeSize / 3) {
+							type = "b2";
 						}
 						tileInfo[r][c][3] = type;
 
@@ -158,14 +158,14 @@
 
 						if(type == "f") continue;
 
-						var material = buildingMaterial;
+						var material = materialDict[type];
 						var geometry = geometryDict[type];
 						if(type == "t1") {
 							let tVal = (value - 0.6) / (0.7 - 0.6);
 
 							geometry = geometry.clone();
-							let h = tVal > 0.5 ? 3 : 7;
-							geometry.scale(1.25, h, 1.25);
+							let h = tVal > 0.5 ? 2 : 5;
+							geometry.scale(1, h, 1);
 							geometry.translate(0, h / 2, 0);
 
 							if(tileInfo[r][c][4] > planeSize / 3 && tVal % 0.5 > 0.25) material = new THREE.MeshPhongMaterial({ color: new THREE.Color().setHSL(tVal, 0.25, 0.6) });
@@ -179,7 +179,7 @@
 									if(Math.random() > 0.5) continue;
 
 									let h = 2 + (3 * Math.random());
-									let t2Geometry = new THREE.BoxGeometry(0.85, h, 0.85);
+									let t2Geometry = new THREE.BoxGeometry(0.9, h, 0.9);
 									let translateMatrix = new THREE.Matrix4();
 									translateMatrix.set(
 										1, 0, 0, i,
@@ -229,7 +229,7 @@
 				highwayGeometry.applyMatrix4(highwaySkew);
 
 				var highway = new THREE.Mesh(highwayGeometry, mat);
-				highway.position.set(bridgeAvg + (highwayLength / 2), planeCenter.y + 0.5, planeCenter.z + Math.floor(planeSize / 4));
+				highway.position.set(bridgeAvg + (highwayLength / 2), planeCenter.y + 0.5, planeCenter.z + Math.floor(planeSize / 4) - ((1 - tileScale) / 2));
 				scene.add(highway);
 
 				for(var i = -planeSize / 2; i < planeSize / 2; i++) {
@@ -259,7 +259,7 @@
 
 			// PlaneGeometry
 			const mat = new THREE.MeshPhongMaterial({color:0x4f4f4f, shininess:1, side:THREE.DoubleSide});
-			var planeSize = 32;
+			var planeSize = 28;
 			var p = new THREE.PlaneGeometry(planeSize, planeSize, 100, 100);
 			var plane = new THREE.Mesh(p, mat);
 			var planeCenter = new THREE.Vector3(0,-parseInt(planeSize/4),-planeSize/2);
@@ -280,19 +280,23 @@
 
 			//make the camera able to rotate around the city 
 			//based on the a,d keys
-			var angle1 = THREE.MathUtils.degToRad(270);
-			var angle2 = 0;
-			var zoom = 1;
-			let camPos = new THREE.Vector3(
-				1.2 * Math.cos(angle1) * Math.cos(angle2),
-				0.8 * Math.sin(angle2),
-				1.2 * Math.sin(angle1) * Math.cos(angle2)
-			);
-			camPos.normalize().multiplyScalar(zoom * planeSize);
-			camPos.add(new THREE.Vector3(0, 0, planeCenter.z));
-			camera.position.set(camPos.x, camPos.y, camPos.z);
+			var updateCamera = function() {
+				let camPos = new THREE.Vector3(
+					1.2 * Math.cos(angle1) * Math.cos(angle2),
+					0.8 * Math.sin(angle2),
+					1.2 * Math.sin(angle1) * Math.cos(angle2)
+				);
+				camPos.normalize().multiplyScalar(zoom * planeSize);
+				camPos.add(new THREE.Vector3(0, planeCenter.y, planeCenter.z));
+				camera.position.set(camPos.x, camPos.y, camPos.z);
+				camera.lookAt(0, planeCenter.y, planeCenter.z);
+			}
 
-			camera.lookAt(0,0,planeCenter.z);
+			var angle1 = THREE.MathUtils.degToRad(270);
+			var angle2 = 0.2;
+			var zoom = 1;
+			updateCamera();
+
 			document.onkeypress =  function(event) {
 				var x = event.key;
 				if(x == 'a') {
@@ -312,25 +316,19 @@
 				if(angle2 < 0) angle2 = 0;
 				if(zoom < 0.1) zoom = 0.1;
 				if(zoom > 1) zoom = 1;
-				let camPos = new THREE.Vector3(
-					1.2 * Math.cos(angle1) * Math.cos(angle2),
-					0.8 * Math.sin(angle2),
-					1.2 * Math.sin(angle1) * Math.cos(angle2)
-				);
-				camPos.normalize().multiplyScalar(zoom * planeSize);
-				camPos.add(new THREE.Vector3(0, 0, planeCenter.z));
-				camera.position.set(camPos.x, camPos.y, camPos.z);
-				camera.lookAt(0,0,planeCenter.z);
+				updateCamera();
 			};
 
-			var buildingMaterial = new THREE.MeshPhongMaterial({ color: 0xc5c5c0, shininess:5 })
+			var buildingMaterial = new THREE.MeshPhongMaterial({ color: 0xc5c5c0, shininess:10 });
+			var industrialMaterial = new THREE.MeshPhongMaterial({ color: 0x8a8080, shininess:10 });
+			var gardenMaterial = new THREE.MeshPhongMaterial({ color: 0xbac0b0, shininess:10 })
 			var grassMaterial = new THREE.MeshPhongMaterial({ color:0x20a020, shininess:1 });
 			var concreteMaterial = new THREE.MeshPhongMaterial({ color:0xaaaaaa, shininess:20 });
-			var t2Material = new THREE.MeshPhongMaterial({ color:0x554565, shininess:100 });
+			var t2Material = new THREE.MeshPhongMaterial({ color:0x55505f, shininess:100 });
 
 			let count = 0;
 			let monke;
-			let building1, building2, building3;
+			let building1, building2;
 			let industrial1;
 			let industrial2 = new THREE.BoxGeometry(2.2, 0.5, 2);
 			industrial2.translate(0, 0.25, 0);
@@ -340,9 +338,13 @@
 			let bridge = new THREE.BoxGeometry(0.3, 1, 1.0);
 			bridge.translate(0, 0.5, 0);
 			let field = null;
+
 			let geometryDict;
+			let materialDict;
+
 			loadModel("monke.obj", (object) => { monke = object.children[0].geometry; count++; });
 			loadModel("plan_voisin_building_1.obj", (object) => { building1 = object.children[0].geometry; count++; });
+			loadModel("plan_voisin_building_2.obj", (object) => { building2 = object.children[0].geometry; count++; });
 			loadModel("plan_voisin_garden_1.obj", (object) => { garden1 = object.children[0].geometry; garden1.scale(0.8, 0.8, 0.8); count++; });
 			loadModel("plan_voisin_industrial_1.obj", (object) => { industrial1 = object.children[0].geometry; count++; });
 
@@ -362,11 +364,22 @@
 					"br": bridge,
 					"f": field
 				}
+				materialDict = {
+					"b1": buildingMaterial,
+					"b2": buildingMaterial,
+					"i1": industrialMaterial,
+					"i2": industrialMaterial,
+					"g1": gardenMaterial,
+					"t1": buildingMaterial,
+					"t2": t2Material,
+					"br": buildingMaterial,
+					"f": null
+				}
 			}
 
 			function animate() {
 				requestAnimationFrame(animate);
-				if(count == 4) {
+				if(count == 5) {
 					count = -1;
 					afterLoadedOBJs();
 				}
