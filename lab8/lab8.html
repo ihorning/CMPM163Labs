@@ -95,7 +95,9 @@
 						tileInfo[r][c] = [
 							r + ((c * s) % 1) + tileScale / 2,
 							planeCenter.z + c + tileScale / 2,
-							value
+							value,
+							undefined,
+							Math.sqrt((r * r) + (c * c))
 						];
 
 						let type;
@@ -105,6 +107,8 @@
 							type = "br";
 							bridgeCount++;
 							bridgeAvg += tileInfo[r][c][0];
+						} else if(tileInfo[r][c][4] > planeSize * 0.5) {
+							type = "t2";
 						} else if(value < 0.3) {
 							type = "i2";
 						} else if(value < 0.4) {
@@ -114,16 +118,14 @@
 						} else if(value < 0.6) {
 							type = "b2";
 						} else if(value < 0.7) {
-							type = "t";
+							type = "t1";
 						} else {
 							type = "b1";
 						}
 						tileInfo[r][c][3] = type;
 
-						tileInfo[r][c][4] = Math.sqrt((r * r) + (c * c));
-
 						let material;
-						if(type != "i1" && type != "i2" && type != "t") {
+						if(type != "i1" && type != "i2" && type != "t1" && type != "t2") {
 							material = grassMaterial;
 						} else {
 							material = concreteMaterial;
@@ -156,9 +158,9 @@
 
 						if(type == "f") continue;
 
-						var material = concreteMaterial;
+						var material = buildingMaterial;
 						var geometry = geometryDict[type];
-						if(type == "t") {
+						if(type == "t1") {
 							let tVal = (value - 0.6) / (0.7 - 0.6);
 
 							geometry = geometry.clone();
@@ -167,6 +169,29 @@
 							geometry.translate(0, h / 2, 0);
 
 							if(tileInfo[r][c][4] > planeSize / 3 && tVal % 0.5 > 0.25) material = new THREE.MeshPhongMaterial({ color: new THREE.Color().setHSL(tVal, 0.25, 0.6) });
+						}
+						if(type == "t2") {
+							material = t2Material;
+							geometry = new THREE.Geometry();
+							for(var i = -1; i <= 1; i++) {
+								for(var j = -1; j <= 1; j++) {
+
+									if(Math.random() > 0.5) continue;
+
+									let h = 2 + (3 * Math.random());
+									let t2Geometry = new THREE.BoxGeometry(0.85, h, 0.85);
+									let translateMatrix = new THREE.Matrix4();
+									translateMatrix.set(
+										1, 0, 0, i,
+										0, 1, 0, h / 2,
+										0, 0, 1, j,
+										0, 0, 0, 1
+									);
+									t2Geometry.applyMatrix4(translateMatrix);
+									geometry.merge(t2Geometry, t2Geometry.matrix);
+								
+								}
+							}
 						}
 
 						var building = new THREE.Mesh(geometry, material);
@@ -233,7 +258,7 @@
 			camera.lookAt(0,0,0);
 
 			// PlaneGeometry
-			const mat = new THREE.MeshPhongMaterial({color:0x4f4f4f, shininess:100, side:THREE.DoubleSide});
+			const mat = new THREE.MeshPhongMaterial({color:0x4f4f4f, shininess:1, side:THREE.DoubleSide});
 			var planeSize = 32;
 			var p = new THREE.PlaneGeometry(planeSize, planeSize, 100, 100);
 			var plane = new THREE.Mesh(p, mat);
@@ -245,7 +270,7 @@
 
 			// add the lights all around the city
 			for(var a = 270; a < 270 * 2; a+=100) {
-				var light = new THREE.PointLight(0xffffff, 1, planeSize * 2);
+				var light = new THREE.PointLight(0xffffff, 1, planeSize * 2.25);
 				light.position.set(
 					planeSize * Math.cos(THREE.MathUtils.degToRad(a)),
 					planeCenter.y + planeSize/2,
@@ -266,9 +291,7 @@
 			camPos.normalize().multiplyScalar(zoom * planeSize);
 			camPos.add(new THREE.Vector3(0, 0, planeCenter.z));
 			camera.position.set(camPos.x, camPos.y, camPos.z);
-			//camera.position.x = planeSize * 1.2 * Math.cos(angle1) * Math.cos(angle2);
-			//camera.position.z = planeCenter.z + planeSize * 1.2 * Math.sin(angle1) * Math.cos(angle2);
-			//camera.position.y = planeSize * 0.8 * Math.sin(angle2);
+
 			camera.lookAt(0,0,planeCenter.z);
 			document.onkeypress =  function(event) {
 				var x = event.key;
@@ -300,15 +323,20 @@
 				camera.lookAt(0,0,planeCenter.z);
 			};
 
-			var grassMaterial = new THREE.MeshPhongMaterial({ color:0x22bb22 });
-			var concreteMaterial = new THREE.MeshPhongMaterial({ color:0xaaaaaa });
+			var buildingMaterial = new THREE.MeshPhongMaterial({ color: 0xc5c5c0, shininess:5 })
+			var grassMaterial = new THREE.MeshPhongMaterial({ color:0x20a020, shininess:1 });
+			var concreteMaterial = new THREE.MeshPhongMaterial({ color:0xaaaaaa, shininess:20 });
+			var t2Material = new THREE.MeshPhongMaterial({ color:0x554565, shininess:100 });
 
 			let count = 0;
 			let monke;
 			let building1, building2, building3;
-			let industrial1, industrial2;
+			let industrial1;
+			let industrial2 = new THREE.BoxGeometry(2.2, 0.5, 2);
+			industrial2.translate(0, 0.25, 0);
 			let garden1;
-			let tower = new THREE.BoxGeometry(1.25, 1, 1.25);
+			let tower1 = new THREE.BoxGeometry(1.25, 1, 1.25);
+			let tower2 = null;
 			let bridge = new THREE.BoxGeometry(0.3, 1, 1.0);
 			bridge.translate(0, 0.5, 0);
 			let field = null;
@@ -329,7 +357,8 @@
 					"i1": industrial1,
 					"i2": industrial2,
 					"g1": garden1,
-					"t": tower,
+					"t1": tower1,
+					"t2": tower2,
 					"br": bridge,
 					"f": field
 				}
