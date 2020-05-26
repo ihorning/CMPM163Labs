@@ -65,14 +65,22 @@
 
 				// now noiseData is a list of semi-random values from 0 to 255
 				// building generation code will go here:
-				var buildingPositions = [];
+				var tileInfo = [];
 				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
-					buildingPositions[r] = [];
+					tileInfo[r] = [];
 					for(var c = -planeSize / 2; c < planeSize / 2; c++) {
+						// Map index from -planeSize/2 => 0 => planeSize/2  to  1 => 0 => 1  so there is symmetry about the center
+						let indexR = noiseData.length * (r < 0 ? (-2 * r) : (2 * r)) / planeSize;
+						if(indexR + Math.floor(Math.sqrt(noiseData.length)) >= noiseData.length) indexR -= Math.floor(Math.sqrt(noiseData.length));
+						let indexC = Math.sqrt(noiseData.length) * (c < 0 ? (-2 * c) : (2 * c)) / planeSize;
+						let noiseIndex = Math.floor(indexR) + Math.floor(indexC);
+						if(noiseIndex >= indexR + Math.floor(Math.sqrt(noiseData.length))) noiseIndex--;
+						let value = noiseData[noiseIndex] / 255;
+
 						var geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
 						geometry.rotateX(-Math.PI / 2);
 						let skewMatrix = new THREE.Matrix4();
-						let s = 0.5;
+						let s = 0.2;
 						skewMatrix.set(
 							1, 0, s, 0,
 							0, 1, 0, 0,
@@ -80,40 +88,64 @@
 							0, 0, 0, 1
 						);
 						geometry.applyMatrix4(skewMatrix);
-						var material = new THREE.MeshPhongMaterial({ color:0x00ff00 });
-						var grass = new THREE.Mesh(geometry, material);
-						grass.scale.x = 0.9;
-						grass.scale.z = 0.9;
-						buildingPositions[r][c] = [
-							r + ((c * s) % 1) + grass.scale.x / 2,
-							planeCenter.z + c + grass.scale.z / 2
+
+						let tileScale = 0.9;
+
+						tileInfo[r][c] = [
+							r + ((c * s) % 1) + tileScale / 2,
+							planeCenter.z + c + tileScale / 2,
+							value
 						];
-						grass.position.x = buildingPositions[r][c][0];
-						grass.position.z = buildingPositions[r][c][1];
+
+						if(value < 0.3) {
+							tileInfo[r][c][3] = "i2";
+						} else if(value < 0.4) {
+							tileInfo[r][c][3] = "i1";
+						} else if(value < 0.5) {
+							tileInfo[r][c][3] = "g1";
+						} else if(value < 0.6) {
+							tileInfo[r][c][3] = "b2";
+						} else if(value < 0.7) {
+							tileInfo[r][c][3] = "t";
+						} else {
+							tileInfo[r][c][3] = "b1";
+						}
+
+						let material;
+						if(tileInfo[r][c][3] != "i1" && tileInfo[r][c][3] != "i2" && tileInfo[r][c][3] != "t") {
+							material = new THREE.MeshPhongMaterial({ color:0x22bb22 });
+						} else {
+							material = new THREE.MeshPhongMaterial({ color:0xaaaaaa });
+						}
+
+						var grass = new THREE.Mesh(geometry, material);
+						grass.scale.x = tileScale;
+						grass.scale.z = tileScale;
+
+						grass.position.x = tileInfo[r][c][0];
+						grass.position.z = tileInfo[r][c][1];
 						grass.position.y = planeCenter.y + 0.001;
 						scene.add(grass);
 					}
 				}
 				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
 					for(var c = -planeSize / 2; c < planeSize / 2; c++) {
-						// Map index from -planeSize/2 => 0 => planeSize/2  to  1 => 0 => 1  so there is symmetry about the center
-						let indexR = noiseData.length * (r < 0 ? (-2 * r) : (2 * r)) / planeSize;
-						if(indexR + Math.floor(Math.sqrt(noiseData.length)) >= noiseData.length) indexR -= Math.floor(Math.sqrt(noiseData.length));
-						let indexC = Math.sqrt(noiseData.length) * (c < 0 ? (-2 * c) : (2 * c)) / planeSize;
-						console.log(r+" "+indexC);
-						let noiseIndex = Math.floor(indexR) + Math.floor(indexC);
-						if(noiseIndex >= indexR + Math.floor(Math.sqrt(noiseData.length))) noiseIndex--;
-						var geometry = building1;
-						var material = new THREE.MeshPhongMaterial({ color: new THREE.Color(noiseData[noiseIndex] / 255, noiseData[noiseIndex] / 255, noiseData[noiseIndex] / 255) });
-						var cube = new THREE.Mesh(geometry, material);
-						//cube.scale.y = noiseData[noiseIndex] / 255;
-						cube.scale.y = 0.25;
-						cube.scale.x = 0.25;
-						cube.scale.z = 0.25;
-						cube.position.x = buildingPositions[r][c][0];
-						cube.position.z = buildingPositions[r][c][1];
-						cube.position.y = planeCenter.y;
-						scene.add(cube);
+						var geometry = geometryDict[tileInfo[r][c][3]];
+						if(tileInfo[r][c][3] == "t") {
+							geometry = geometry.clone();
+							let h = tileInfo[r][c][2] > 0.65 ? 3 : 7;
+							geometry.scale(1.25, h, 1.25);
+							geometry.translate(0, h / 2, 0);
+						}
+						var material = new THREE.MeshPhongMaterial({ color: new THREE.Color(tileInfo[r][c][2], tileInfo[r][c][2], tileInfo[r][c][2]) });
+						var building = new THREE.Mesh(geometry, material);
+						building.scale.y = 0.25;
+						building.scale.x = 0.25;
+						building.scale.z = 0.25;
+						building.position.x = tileInfo[r][c][0];
+						building.position.z = tileInfo[r][c][1];
+						building.position.y = planeCenter.y;
+						scene.add(building);
 					}
 				}
 			}
@@ -131,7 +163,7 @@
 
 			// PlaneGeometry
 			const mat = new THREE.MeshPhongMaterial({color:0x4f4f4f, shininess:100, side:THREE.DoubleSide});
-			var planeSize = 24;
+			var planeSize = 32;
 			var p = new THREE.PlaneGeometry(planeSize, planeSize, 100, 100);
 			var plane = new THREE.Mesh(p, mat);
 			var planeCenter = new THREE.Vector3(0,-parseInt(planeSize/4),-planeSize/2);
@@ -200,20 +232,34 @@
 
 			let count = 0;
 			let monke;
-			let building1;
+			let building1, building2, building3;
+			let industrial1, industrial2;
+			let garden1;
+			let tower = new THREE.BoxGeometry(1.25, 1, 1.25);
+			let geometryDict;
 			loadModel("monke.obj", (object) => { monke = object.children[0].geometry; count++; });
 			loadModel("plan_voisin_building_1.obj", (object) => { building1 = object.children[0].geometry; count++; });
+			loadModel("plan_voisin_garden_1.obj", (object) => { garden1 = object.children[0].geometry; garden1.scale(0.8, 0.8, 0.8); count++; });
+			loadModel("plan_voisin_industrial_1.obj", (object) => { industrial1 = object.children[0].geometry; count++; });
 
 			function afterLoadedOBJs() {
 				console.log("All OBJs loaded");
 				var context = initContext('canvas','2d'); // initialize the canvas
 				loadImage('perlin_34_34.jpg',context); // load the perlin image
 				//loadImage('testgradient.jpg',context);
+				geometryDict = {
+					"b1": building1,
+					"b2": building2,
+					"i1": industrial1,
+					"i2": industrial2,
+					"g1": garden1,
+					"t": tower
+				}
 			}
 
 			function animate() {
 				requestAnimationFrame(animate);
-				if(count == 2) {
+				if(count == 4) {
 					count = -1;
 					afterLoadedOBJs();
 				}
