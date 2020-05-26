@@ -107,7 +107,7 @@
 							type = "br";
 							bridgeCount++;
 							bridgeAvg += tileInfo[r][c][0];
-						} else if(tileInfo[r][c][4] > planeSize * 0.5) {
+						} else if(tileInfo[r][c][4] > planeSize * 0.425 && (Math.abs(c) > planeSize * 0.4 || r > 0)) {
 							type = "t2";
 						} else if(Math.abs(r) <= 3 && Math.abs(c) <= 2) {
 							type = "b1";
@@ -335,7 +335,7 @@
 			let garden1;
 			let tower1 = new THREE.BoxGeometry(1.25, 1, 1.25);
 			let tower2 = null;
-			let bridge = new THREE.BoxGeometry(0.3, 1, 1.0);
+			let bridge = new THREE.BoxGeometry(0.4, 1, 1.0);
 			bridge.translate(0, 0.5, 0);
 			let field = null;
 
