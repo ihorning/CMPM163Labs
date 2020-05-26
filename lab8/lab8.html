@@ -96,17 +96,20 @@
 				}
 				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
 					for(var c = -planeSize / 2; c < planeSize / 2; c++) {
-						//var geometry = new THREE.BoxGeometry();
+						// Map index from -planeSize/2 => 0 => planeSize/2  to  1 => 0 => 1  so there is symmetry about the center
+						let indexR = noiseData.length * (r < 0 ? (-2 * r) : (2 * r)) / planeSize;
+						if(indexR + Math.floor(Math.sqrt(noiseData.length)) >= noiseData.length) indexR -= Math.floor(Math.sqrt(noiseData.length));
+						let indexC = Math.sqrt(noiseData.length) * (c < 0 ? (-2 * c) : (2 * c)) / planeSize;
+						console.log(r+" "+indexC);
+						let noiseIndex = Math.floor(indexR) + Math.floor(indexC);
+						if(noiseIndex >= indexR + Math.floor(Math.sqrt(noiseData.length))) noiseIndex--;
 						var geometry = building1;
-						var material = new THREE.MeshPhongMaterial({ color:0xaaaaaa });
+						var material = new THREE.MeshPhongMaterial({ color: new THREE.Color(noiseData[noiseIndex] / 255, noiseData[noiseIndex] / 255, noiseData[noiseIndex] / 255) });
 						var cube = new THREE.Mesh(geometry, material);
-						// This index should grab the color at row r and column c
-						let noiseIndex = Math.floor(noiseData.length * (r + (planeSize / 2)) / planeSize) + Math.floor(Math.sqrt(noiseData.length) * (c + (planeSize / 2)) / planeSize);
-						// Scale the value
-						//cube.scale.y = 2 * (5 + ((noiseData[noiseIndex] - minVal) % 64)) / 64;
-						cube.scale.y = 0.2;
-						cube.scale.x = 0.2;
-						cube.scale.z = 0.2;
+						//cube.scale.y = noiseData[noiseIndex] / 255;
+						cube.scale.y = 0.25;
+						cube.scale.x = 0.25;
+						cube.scale.z = 0.25;
 						cube.position.x = buildingPositions[r][c][0];
 						cube.position.z = buildingPositions[r][c][1];
 						cube.position.y = planeCenter.y;
@@ -128,7 +131,7 @@
 
 			// PlaneGeometry
 			const mat = new THREE.MeshPhongMaterial({color:0x4f4f4f, shininess:100, side:THREE.DoubleSide});
-			var planeSize = 8;
+			var planeSize = 30;
 			var p = new THREE.PlaneGeometry(planeSize, planeSize, 100, 100);
 			var plane = new THREE.Mesh(p, mat);
 			var planeCenter = new THREE.Vector3(0,-parseInt(planeSize/4),-planeSize/2);
@@ -139,7 +142,7 @@
 
 			// add the lights all around the city
 			for(var a = 270; a < 270 * 2; a+=100) {
-				var light = new THREE.PointLight(0xffffff, 1, planeSize * 1.5);
+				var light = new THREE.PointLight(0xffffff, 1, planeSize * 2);
 				light.position.set(
 					planeSize * Math.cos(THREE.MathUtils.degToRad(a)),
 					planeCenter.y + planeSize/2,
@@ -177,6 +180,7 @@
 				console.log("All OBJs loaded");
 				var context = initContext('canvas','2d'); // initialize the canvas
 				loadImage('perlin_34_34.jpg',context); // load the perlin image
+				//loadImage('testgradient.jpg',context);
 			}
 
 			function animate() {
