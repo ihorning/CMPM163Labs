@@ -66,6 +66,7 @@
 				// now noiseData is a list of semi-random values from 0 to 255
 				// building generation code will go here:
 				var tileInfo = [];
+				var bridgeAvg = 0, bridgeCount = 0;
 				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
 					tileInfo[r] = [];
 					for(var c = -planeSize / 2; c < planeSize / 2; c++) {
@@ -97,56 +98,90 @@
 							value
 						];
 
-						if(value < 0.3) {
-							tileInfo[r][c][3] = "i2";
+						let type;
+						if(r == -planeSize / 2) {
+							type = "f";
+						} else if(r == (-planeSize / 2) + 1) {
+							type = "br";
+							bridgeCount++;
+							bridgeAvg += tileInfo[r][c][0];
+						} else if(value < 0.3) {
+							type = "i2";
 						} else if(value < 0.4) {
-							tileInfo[r][c][3] = "i1";
+							type = "i1";
 						} else if(value < 0.5) {
-							tileInfo[r][c][3] = "g1";
+							type = "g1";
 						} else if(value < 0.6) {
-							tileInfo[r][c][3] = "b2";
+							type = "b2";
 						} else if(value < 0.7) {
-							tileInfo[r][c][3] = "t";
+							type = "t";
 						} else {
-							tileInfo[r][c][3] = "b1";
+							type = "b1";
 						}
+						tileInfo[r][c][3] = type;
 
 						let material;
-						if(tileInfo[r][c][3] != "i1" && tileInfo[r][c][3] != "i2" && tileInfo[r][c][3] != "t") {
+						if(type != "i1" && type != "i2" && type != "t") {
 							material = new THREE.MeshPhongMaterial({ color:0x22bb22 });
 						} else {
 							material = new THREE.MeshPhongMaterial({ color:0xaaaaaa });
 						}
 
 						var grass = new THREE.Mesh(geometry, material);
-						grass.scale.x = tileScale;
-						grass.scale.z = tileScale;
+						if(type != "f" && type != "br") {
+							grass.scale.x = tileScale;
+							grass.scale.z = tileScale;
+						} else {
+							grass.scale.x = 1;
+							grass.scale.z = 1;
+						}
 
 						grass.position.x = tileInfo[r][c][0];
 						grass.position.z = tileInfo[r][c][1];
-						grass.position.y = planeCenter.y + 0.001;
+						grass.position.y = planeCenter.y + 0.005;
 						scene.add(grass);
 					}
 				}
+				
+				bridgeAvg /= bridgeCount;
+				bridgeAvg -= 0.5;
+
 				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
 					for(var c = -planeSize / 2; c < planeSize / 2; c++) {
-						var geometry = geometryDict[tileInfo[r][c][3]];
-						if(tileInfo[r][c][3] == "t") {
+
+						let type = tileInfo[r][c][3];
+						let value = tileInfo[r][c][2];
+
+						if(type == "f") continue;
+
+						var geometry = geometryDict[type];
+						if(type == "t") {
 							geometry = geometry.clone();
-							let h = tileInfo[r][c][2] > 0.65 ? 3 : 7;
+							let h = value > 0.65 ? 3 : 7;
 							geometry.scale(1.25, h, 1.25);
 							geometry.translate(0, h / 2, 0);
 						}
-						var material = new THREE.MeshPhongMaterial({ color: new THREE.Color(tileInfo[r][c][2], tileInfo[r][c][2], tileInfo[r][c][2]) });
+
+						var material = new THREE.MeshPhongMaterial({ color: new THREE.Color(value, value, value) });
 						var building = new THREE.Mesh(geometry, material);
-						building.scale.y = 0.25;
-						building.scale.x = 0.25;
-						building.scale.z = 0.25;
-						building.position.x = tileInfo[r][c][0];
-						building.position.z = tileInfo[r][c][1];
-						building.position.y = planeCenter.y;
+						
+						if(type != "br") {
+							building.scale.x = 0.25;
+							building.scale.y = 0.25;
+							building.scale.z = 0.25;
+
+							building.position.x = tileInfo[r][c][0];
+							building.position.z = tileInfo[r][c][1];
+							building.position.y = planeCenter.y;
+						} else {
+							building.position.x = bridgeAvg;
+							building.position.z = tileInfo[r][c][1];
+							building.position.y = planeCenter.y;
+						}
+
 						if(r < 0) building.rotation.y = 0;
 						else building.rotation.y = Math.PI;
+
 						scene.add(building);
 					}
 				}
@@ -238,6 +273,9 @@
 			let industrial1, industrial2;
 			let garden1;
 			let tower = new THREE.BoxGeometry(1.25, 1, 1.25);
+			let bridge = new THREE.BoxGeometry(0.3, 1, 1.0);
+			bridge.translate(0, 0.5, 0);
+			let field = null;
 			let geometryDict;
 			loadModel("monke.obj", (object) => { monke = object.children[0].geometry; count++; });
 			loadModel("plan_voisin_building_1.obj", (object) => { building1 = object.children[0].geometry; count++; });
@@ -255,7 +293,9 @@
 					"i1": industrial1,
 					"i2": industrial2,
 					"g1": garden1,
-					"t": tower
+					"t": tower,
+					"br": bridge,
+					"f": field
 				}
 			}
 
