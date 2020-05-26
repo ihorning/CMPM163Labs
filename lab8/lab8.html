@@ -10,8 +10,24 @@
 	</head>
 	<body>
 		<script src="../three.js-master/build/three.js"></script>
+		<script src="../three.js-master/examples/js/loaders/OBJLoader.js"></script>
 		<script>
-
+			var loader = new THREE.OBJLoader();
+			function loadModel(url, callback) {
+				var model;
+				loader.load(
+					url,
+					callback,
+					function(xhr) {
+						console.log((xhr.loaded / xhr.total * 100)+"% loaded");
+					},
+					function(error) {
+						console.log("Error!");
+					}
+				);
+			}
+		</script>
+		<script>
 			// this function loads the context for the canvas
 			function initContext(canvasID, contextType) {
 				var canvas = document.createElement('canvas');
@@ -80,7 +96,8 @@
 				}
 				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
 					for(var c = -planeSize / 2; c < planeSize / 2; c++) {
-						var geometry = new THREE.BoxGeometry();
+						//var geometry = new THREE.BoxGeometry();
+						var geometry = monke;
 						var material = new THREE.MeshPhongMaterial({ color:0xaaaaaa });
 						var cube = new THREE.Mesh(geometry, material);
 						// This index should grab the color at row r and column c
@@ -97,10 +114,6 @@
 				}
 			}
 
-			var context = initContext('canvas','2d'); // initialize the canvas
-			loadImage('perlin_34_34.jpg',context); // load the perlin image
-
-
 
 			// setup the scene
 			var scene = new THREE.Scene();
@@ -113,7 +126,7 @@
 			camera.lookAt(0,0,0);
 
 			// PlaneGeometry
-			const mat = new THREE.MeshPhongMaterial({color:0x4f4f4f, Shininess:100, side:THREE.DoubleSide});
+			const mat = new THREE.MeshPhongMaterial({color:0x4f4f4f, shininess:100, side:THREE.DoubleSide});
 			var planeSize = 16;
 			var p = new THREE.PlaneGeometry(planeSize, planeSize, 100, 100);
 			var plane = new THREE.Mesh(p, mat);
@@ -153,8 +166,22 @@
 			};
 
 
+			let count = 0;
+			let monke;
+			loadModel("monke.obj", (object) => { monke = object.children[0].geometry; count++; });
+
+			function afterLoadedOBJs() {
+				console.log("All OBJs loaded");
+				var context = initContext('canvas','2d'); // initialize the canvas
+				loadImage('perlin_34_34.jpg',context); // load the perlin image
+			}
+
 			function animate() {
 				requestAnimationFrame(animate);
+				if(count == 1) {
+					count = -1;
+					afterLoadedOBJs();
+				}
 				renderer.render(scene, camera);
 			}
 			animate();
