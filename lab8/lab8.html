@@ -145,6 +145,8 @@
 						building.position.x = tileInfo[r][c][0];
 						building.position.z = tileInfo[r][c][1];
 						building.position.y = planeCenter.y;
+						if(r < 0) building.rotation.y = 0;
+						else building.rotation.y = Math.PI;
 						scene.add(building);
 					}
 				}
