@@ -80,12 +80,17 @@ We didn't help each other with the lab.
 
 ## Lab 8 (Part 2)
 My procedurally generated city is inspired by various city plans/buildings by Le Corbusier.
+Here is a picture of my generated city:
+![](lab8/lab8_capture1.PNG)
+
+Here is a link to a video: https://drive.google.com/file/d/1KVPudJMeap2e-zOgs7nXWq2JDeFEVqmC/view?usp=sharing
+
 Here are a couple of pictures of his "Plan Voisin," a plan for reconstructing Paris:
 ![](lab8/Plan_Voisin_model.jpg)
 ![](lab8/plan-voisin.jpg)
 ![](lab8/unnamed.jpg)
 
-Most of the building models I used are based on those seen in the Plan Voisin, and the arrangement of them (the + buildings in a rectangle, the w-like ones around, the rectangle gardens bordering those, etc.) are based on these models.
+Most of the building models I used are based on those seen in the Plan Voisin, and the arrangement of them (the + buildings in a rectangle, the w-like ones around, the rectangle gardens bordering those, etc.) are based on these models. The non-perpendicular roads seen in some of these pictures is why I chose to skew the city tiles.
 
 Here is a picture of his proposed "Obus" plan for the port of Algiers:
 ![](lab8/6_115_feature.jpg)
