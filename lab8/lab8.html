@@ -72,7 +72,7 @@
 						var geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
 						geometry.rotateX(-Math.PI / 2);
 						let skewMatrix = new THREE.Matrix4();
-						let s = 0.5;
+						let s = 0.125;
 						skewMatrix.set(
 							1, 0, s, 0,
 							0, 1, 0, 0,
@@ -97,18 +97,19 @@
 				for(var r = -planeSize / 2; r < planeSize / 2; r++) {
 					for(var c = -planeSize / 2; c < planeSize / 2; c++) {
 						//var geometry = new THREE.BoxGeometry();
-						var geometry = monke;
+						var geometry = building1;
 						var material = new THREE.MeshPhongMaterial({ color:0xaaaaaa });
 						var cube = new THREE.Mesh(geometry, material);
 						// This index should grab the color at row r and column c
 						let noiseIndex = Math.floor(noiseData.length * (r + (planeSize / 2)) / planeSize) + Math.floor(Math.sqrt(noiseData.length) * (c + (planeSize / 2)) / planeSize);
 						// Scale the value
-						cube.scale.y = 2 * (5 + ((noiseData[noiseIndex] - minVal) % 64)) / 64;
-						cube.scale.x = 0.4;
-						cube.scale.z = 0.4;
+						//cube.scale.y = 2 * (5 + ((noiseData[noiseIndex] - minVal) % 64)) / 64;
+						cube.scale.y = 0.2;
+						cube.scale.x = 0.2;
+						cube.scale.z = 0.2;
 						cube.position.x = buildingPositions[r][c][0];
 						cube.position.z = buildingPositions[r][c][1];
-						cube.position.y = planeCenter.y + cube.scale.y / 2;
+						cube.position.y = planeCenter.y;
 						scene.add(cube);
 					}
 				}
@@ -127,7 +128,7 @@
 
 			// PlaneGeometry
 			const mat = new THREE.MeshPhongMaterial({color:0x4f4f4f, shininess:100, side:THREE.DoubleSide});
-			var planeSize = 16;
+			var planeSize = 8;
 			var p = new THREE.PlaneGeometry(planeSize, planeSize, 100, 100);
 			var plane = new THREE.Mesh(p, mat);
 			var planeCenter = new THREE.Vector3(0,-parseInt(planeSize/4),-planeSize/2);
@@ -168,7 +169,9 @@
 
 			let count = 0;
 			let monke;
+			let building1;
 			loadModel("monke.obj", (object) => { monke = object.children[0].geometry; count++; });
+			loadModel("plan_voisin_building_1.obj", (object) => { building1 = object.children[0].geometry; count++; });
 
 			function afterLoadedOBJs() {
 				console.log("All OBJs loaded");
@@ -178,7 +181,7 @@
 
 			function animate() {
 				requestAnimationFrame(animate);
-				if(count == 1) {
+				if(count == 2) {
 					count = -1;
 					afterLoadedOBJs();
 				}
