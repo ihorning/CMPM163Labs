@@ -122,9 +122,9 @@
 
 						let material;
 						if(type != "i1" && type != "i2" && type != "t") {
-							material = new THREE.MeshPhongMaterial({ color:0x22bb22 });
+							material = grassMaterial;
 						} else {
-							material = new THREE.MeshPhongMaterial({ color:0xaaaaaa });
+							material = concreteMaterial;
 						}
 
 						var grass = new THREE.Mesh(geometry, material);
@@ -188,7 +188,6 @@
 
 				let highwayLength = (planeSize / 2) - bridgeAvg;
 				var highwayGeometry = new THREE.BoxGeometry(highwayLength, 0.1, 2 * (1 - tileScale));
-				//highwayGeometry.rotateX(-Math.PI / 2);
 				let highwaySkew = new THREE.Matrix4();
 				highwaySkew.set(
 					1, 0, 0, 0,
@@ -201,6 +200,19 @@
 				var highway = new THREE.Mesh(highwayGeometry, mat);
 				highway.position.set(bridgeAvg + (highwayLength / 2), planeCenter.y + 0.5, planeCenter.z + Math.floor(planeSize / 4));
 				scene.add(highway);
+
+				for(var i = -planeSize / 2; i < planeSize / 2; i++) {
+					if(i < bridgeAvg) continue;
+					let piloti1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.01), concreteMaterial);
+					let piloti2 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.01), concreteMaterial);
+					let height = 1 * (highwayLength - (i - bridgeAvg)) / highwayLength;
+					piloti1.position.set(i, planeCenter.y + (height / 2), highway.position.z + (0.75 * (1 - tileScale)));
+					piloti2.position.set(i, planeCenter.y + (height / 2), highway.position.z - (0.75 * (1 - tileScale)));
+					piloti1.scale.y = height;
+					piloti2.scale.y = height;
+					scene.add(piloti1);
+					scene.add(piloti2);
+				}
 			}
 
 
@@ -282,6 +294,8 @@
 				camera.lookAt(0,0,planeCenter.z);
 			};
 
+			var grassMaterial = new THREE.MeshPhongMaterial({ color:0x22bb22 });
+			var concreteMaterial = new THREE.MeshPhongMaterial({ color:0xaaaaaa });
 
 			let count = 0;
 			let monke;
