@@ -101,3 +101,6 @@ The reason I made some of the towers colorful was because of Le Corbusier's "Qua
 ![](lab8/Quartiers-Modernes-Frugès-Le-Corbusier.jpg)
 
 After construction, some of the residents decided to paint their homes in colors to personalize them. I thought bringing this color to my city made it look more interesting.
+
+My lab partner, Daniel Nguyen, also did part 2 of this lab. The most challenging part of the tutorial for him was determining the Y scale of each cube using the noiseData array. The most interesting part of the tutorial for him was how grayscale values from the image were sampled to determine the building scales.
+We did not help each other with this lab.
