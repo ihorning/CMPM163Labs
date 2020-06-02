@@ -121,6 +121,8 @@ Here are my custom rules:
 
 "+" => "-"
 
+I just played around with it until I got these squiggly lines that overlap in interesting ways and look sort of like roots.
+
 Here are screenshots of my tree at different stages (and the sequence text in the console):
 ![](lab9/lab9_capture6.PNG)
 ![](lab9/lab9_capture7.PNG)
