@@ -20,14 +20,44 @@
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			document.body.appendChild(renderer.domElement);
 
-			// example of how to add a line
-			var material = new THREE.LineBasicMaterial({color:0xffffff});
-			var points = [];
-			points.push(new THREE.Vector3(0,0,0));
-			points.push(new THREE.Vector3(0,10,0));
-			var geometry = new THREE.BufferGeometry().setFromPoints(points);
-			var line = new THREE.Line(geometry, material);
-			scene.add(line);
+			var axiom = 'F'; // starting sequence
+			var sequence = axiom; 
+			var lineLength = 15; // starting length of each line segment
+			var deltaAngle = THREE.MathUtils.degToRad(25); // how much we increment the angle by
+			var currentAngle = THREE.MathUtils.degToRad(90); // the starting angle
+			var savedTransformations = []; // the stack we use to save transformations
+			var rules = []; // the array of rules… this way you can easily add more if you want
+			// the rule from the tutorial
+			rules[0] = {
+				a:'F',
+				b:'FF+[+F-F-F]-[-F+F+F]'
+			};
+			var material = new THREE.LineBasicMaterial({color:0xffffff}); // the line color
+			var points = []; // our saved list of points
+
+			//points.push(new THREE.Vector3(0,0,0));
+			//points.push(new THREE.Vector3(0,10,0));
+			//var geometry = new THREE.BufferGeometry().setFromPoints(points);
+			//var line = new THREE.Line(geometry, material);
+			//scene.add(line);
+
+			drawSegment(new THREE.Vector3(0, 0, 0));
+			currentAngle = 1.1 * Math.PI / 2;
+			drawSegment(points[points.length - 1]);
+
+			function drawSegment(currentPosition) {
+				var newPosition = new THREE.Vector3(0,0,0);
+				var delta = new THREE.Vector3(
+					lineLength * Math.cos(currentAngle), //x
+					lineLength * Math.sin(currentAngle), //y
+					0.0);
+				newPosition.addVectors(currentPosition, delta);
+
+				points.push(newPosition);
+				var geometry = new THREE.BufferGeometry().setFromPoints([currentPosition, newPosition]);
+				var line = new THREE.Line(geometry, material);
+				scene.add(line);
+			}
 
 			function animate(time) {
 				requestAnimationFrame(animate);
