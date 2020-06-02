@@ -35,12 +35,6 @@
 			var material = new THREE.LineBasicMaterial({color:0xffffff}); // the line color
 			var points = []; // our saved list of points
 
-			//points.push(new THREE.Vector3(0,0,0));
-			//points.push(new THREE.Vector3(0,10,0));
-			//var geometry = new THREE.BufferGeometry().setFromPoints(points);
-			//var line = new THREE.Line(geometry, material);
-			//scene.add(line);
-
 			function drawSegment(currentPosition) {
 				var newPosition = new THREE.Vector3(0,0,0);
 				var delta = new THREE.Vector3(
@@ -65,9 +59,9 @@
 					if(current == "F") { // Draw a line
 						drawSegment(points[points.length - 1]);
 					} else if (current == "+") { // Turn right
-						currentAngle += deltaAngle;
-					} else if (current == "-") { // Turn left
 						currentAngle -= deltaAngle;
+					} else if (current == "-") { // Turn left
+						currentAngle += deltaAngle;
 					} else if (current == "[") { // Push frame
 						savedTransformations.push({
 							point: points[points.length - 1],
@@ -80,7 +74,28 @@
 					}
 				}
 			}
-			
+
+			function generateSequence() {
+				var newSequence = "";
+				for(var c = 0; c < sequence.length; c++) {
+					var newString = sequence.charAt(c);
+					for(var r = 0; r < rules.length; r++) {
+						if(newString == rules[r].a) {
+							newString = rules[r].b;
+							break;
+						}
+					}
+					newSequence = newSequence+newString;
+				}
+				sequence = newSequence;
+				lineLength /= 2;
+				console.log(sequence);
+				drawSequence(sequence);
+			}
+
+			generateSequence();
+			generateSequence();
+			generateSequence();
 
 			function animate(time) {
 				requestAnimationFrame(animate);
