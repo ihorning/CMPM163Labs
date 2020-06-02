@@ -114,9 +114,10 @@ Here are screenshots of the tree at different stages (and the sequence text in t
 ![](lab9/lab9_capture5.PNG)
 
 Here are my custom rules:
-F => F[---F++F-F]--F[+++F-F]++F
-- => +
-+ => -
+
+"F" => "F[---F++F-F]--F[+++F-F]++F"
+"-" => "+"
+"+" => "-"
 
 Here are screenshots of my tree at different stages (and the sequence text in the console):
 ![](lab9/lab9_capture6.PNG)
