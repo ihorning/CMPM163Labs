@@ -104,3 +104,11 @@ After construction, some of the residents decided to paint their homes in colors
 
 My lab partner, Daniel Nguyen, also did part 2 of this lab. The most challenging part of the tutorial for him was determining the Y scale of each cube using the noiseData array. The most interesting part of the tutorial for him was how grayscale values from the image were sampled to determine the building scales.
 We did not help each other with this lab.
+
+## Lab 9 (Part 2)
+Here are screenshots of the tree at different stages (and the sequence text in the console):
+![](lab9/lab9_capture1.PNG)
+![](lab9/lab9_capture2.PNG)
+![](lab9/lab9_capture3.PNG)
+![](lab9/lab9_capture4.PNG)
+![](lab9/lab9_capture5.PNG)

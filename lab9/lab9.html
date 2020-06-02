@@ -35,6 +35,14 @@
 			var material = new THREE.LineBasicMaterial({color:0xffffff}); // the line color
 			var points = []; // our saved list of points
 
+
+			drawSequence(sequence); // call draw sequence of ‘F’
+
+			// whenever you click, generate another sequence
+			document.addEventListener("click", generateSequence);
+
+
+
 			function drawSegment(currentPosition) {
 				var newPosition = new THREE.Vector3(0,0,0);
 				var delta = new THREE.Vector3(
@@ -92,10 +100,6 @@
 				console.log(sequence);
 				drawSequence(sequence);
 			}
-
-			generateSequence();
-			generateSequence();
-			generateSequence();
 
 			function animate(time) {
 				requestAnimationFrame(animate);
